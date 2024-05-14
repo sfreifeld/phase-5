@@ -4,8 +4,10 @@ import RegistrationOrg from '../components/RegistrationOrg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { supabase } from "../supabaseClient"
 
-function Registration() {
+
+function Registration( { session }) {
   const [activeForm, setActiveForm] = useState(null);
+  console.log(session)
 
   return (
     <div className="container m-5 p-5">
@@ -26,8 +28,8 @@ function Registration() {
           Nonprofit
         </button>
       </div>
-      {activeForm === 'developer' && <RegistrationDev />}
-      {activeForm === 'nonprofit' && <RegistrationOrg />}
+      {activeForm === 'developer' && <RegistrationDev session={session} />}
+      {activeForm === 'nonprofit' && <RegistrationOrg session={session} />}
     </div>
   );
 }
