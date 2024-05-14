@@ -12,6 +12,7 @@ import Home from "./components/Home";
 import Registration from "./pages/Registration";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ProfileDev from "./components/ProfileDev";
+import ProfileOrg from "./components/ProfileOrg"
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -53,7 +54,7 @@ export default function App() {
       const [userResult, organizationResult] = results;
       const userExists = !userResult.error && userResult.data !== null;
       const organizationExists = !organizationResult.error && organizationResult.data !== null;
-      setIsRegistered(userExists|| organizationExists);
+      setIsRegistered(userExists || organizationExists);
     });
   };
 
@@ -73,8 +74,8 @@ export default function App() {
     return (
       <Router>
         <Routes>
-          <Route path="/" element={isRegistered ? <Registration session={session} /> : <Home session={session} />} />
-          <Route path="/profile/:Id" element={<ProfileDev session={session}/>}/>
+          <Route path="/" element={isRegistered ? <Home session={session} /> : <Registration session={session} />} />
+          <Route path="/profile/:Id" element={<ProfileOrg session={session}/>}/>
         </Routes>
       </Router>
     );

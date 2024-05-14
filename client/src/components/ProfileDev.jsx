@@ -1,17 +1,104 @@
 import { supabase } from "../supabaseClient"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardTitle, MDBCardText, MDBCardBody, MDBCardImage, MDBBtn } from 'mdb-react-ui-kit';
 import NavBarMain from "./NavBar";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useParams } from 'react-router-dom';
 
 export default function ProfileDev({ session }) {
+    const [userData, setUserData] = useState(null)
+    const [projects, setProjects] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editableBio, setEditableBio] = useState("Here is your bio.  You can write about your educational experience, your skills, and what you want to work on!");
+    const [skills, setSkills] = useState([])
+    const { id } = useParams();
+
+    const handleEditClick = () => {
+        if (isEditing) {
+            supabase
+                .from('users')
+                .update({ bio: editableBio })
+                .eq('profile_id', session.user.id)
+                .single()
+                .then(({ data: updateData, error: updateError }) => {
+                    if (updateError) {
+                        console.error('Error updating profile:', updateError);
+                    } else {
+                            console.log('Bio updated successfully:', updateData);
+                        }
+                })
+            }
+            setIsEditing(!isEditing);
+        }
+                                
+
+    const handleBioChange = (event) => {
+        setEditableBio(event.target.value);
+    };
+
+    const handleAddSkill = (skill) => {
+        if (skill && !skills.includes(skill)) {
+            setSkills([...skills, skill])
+        }
+    }
+
+    const handleRemoveSkill = (skill) => {
+        setSkills(skills.filter(s => s !== skill))
+    }
+
+    useEffect(() => {
+        if (session && session.user) {
+            supabase
+                .from('users')
+                .select('*')
+                .eq('profile_id', session.user.id)
+                .maybeSingle()
+                .then(({ data: userData, error: userError }) => {
+                    if (userError) {
+                        console.error('Error fetching user data:', userError);
+                        return;
+                    }
+
+                    setUserData(userData);
+                    if (userData) {
+                        return supabase
+                            .from('projects')
+                            .select('*')
+                            .eq('user_id', userData.id);
+                    }
+                })
+                .then(({ data: projectsData, error: projectsError }) => {
+                    if (projectsError) {
+                        console.error('Error fetching projects data:', projectsError);
+                        return;
+                    }
+                    setProjects(projectsData);
+                });
+        }
+    }, [session]);
+
+
+    useEffect(() => {
+        if (userData && userData.bio) {
+            setEditableBio(userData.bio);
+        } else {
+            setEditableBio("Here is your bio. You can write about your educational experience, your skills, and what you want to work on!");
+        }
+
+        if (userData && userData.skills) {
+            setSkills(userData.skills)
+        }
+
+    }, [userData]);
+
+
     return (
       <div className="vh-100 vw-100" style={{ backgroundColor: '#9de2ff' }}>
         <NavBarMain session={session}></NavBarMain>
         <MDBContainer>
-          <MDBRow className="justify-content-left">
-            {/* Existing card */}
+          <MDBRow className="justify-content-left d-flex align-items-stretch">
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px' }}>
+              <MDBCard style={{ borderRadius: '15px', height: '100%' }}>
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-shrink-0">
@@ -22,21 +109,25 @@ export default function ProfileDev({ session }) {
                         fluid />
                     </div>
                     <div className="flex-grow-1 ms-3">
-                      <MDBCardTitle>Danny McLoan</MDBCardTitle>
-                      <MDBCardText>Senior Journalist</MDBCardText>
+                    { userData && (
+                        <>
+                      <MDBCardTitle>{userData.full_name}</MDBCardTitle>
+                      <MDBCardText>{userData.username}</MDBCardText>
+                      </>
+                    )}
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2"
                         style={{ backgroundColor: '#efefef' }}>
                         <div>
                           <p className="small text-muted mb-1">Projects</p>
-                          <p className="mb-0">41</p>
+                          <p className="mb-0">{projects.length}</p>
                         </div>
                         <div className="px-3">
                           <p className="small text-muted mb-1">Hours</p>
-                          <p className="mb-0">976</p>
+                          <p className="mb-0">0</p>
                         </div>
                         <div>
                           <p className="small text-muted mb-1">Rating</p>
-                          <p className="mb-0">8.5</p>
+                          <p className="mb-0">5.0</p>
                         </div>
                       </div>
                       <div className="d-flex pt-1">
@@ -48,23 +139,20 @@ export default function ProfileDev({ session }) {
                 </MDBCardBody>
               </MDBCard>
             </MDBCol>
-            {/* New card to the right */}
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px' }}>
+              <MDBCard style={{ borderRadius: '15px', height: '100%' }}>
                 <MDBCardBody className="p-4">
-                  <div className="d-flex text-black">
-                    <div className="flex-grow-1 ms-3">
-                      <MDBCardTitle>Previous Projects</MDBCardTitle>
-                    </div>
-                  </div>
+                  <MDBCardTitle>Previous Projects</MDBCardTitle>
+                  <ul>
+                    {projects && projects.length > 0 ? (
+                        projects.map(project => (
+                            <li key={project.id}>{project.title}</li>
+                        ))
+                    ) : (
+                        <div>No projects done yet!</div>
+                    )}
+                  </ul>
                 </MDBCardBody>
-                <ul>
-                    <li>Project #1</li>
-                    <li>Project #2</li>
-                    <li>Project #3</li>
-                    <li>Project #4</li>
-                    <li>Project #5</li>
-                </ul>
               </MDBCard>
             </MDBCol>
           </MDBRow>
@@ -74,19 +162,36 @@ export default function ProfileDev({ session }) {
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-grow-1 ms-3">
-                      <MDBCardTitle>Bio</MDBCardTitle>
-                      <MDBCardText>Here is my bio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet nibh et quam dignissim luctus sed non mi. Fusce sem leo, accumsan non tortor eu, viverra pulvinar magna. Suspendisse efficitur rhoncus luctus. Donec tempus nec mi ultricies iaculis. Fusce non arcu arcu. Proin quis tincidunt nibh. Praesent sit amet ligula tempor, facilisis turpis a, ultrices libero. Integer rhoncus imperdiet justo nec laoreet. Proin eget consequat nulla. Ut ac ex nec odio fringilla tempor. Nullam auctor mi metus, eu fringilla purus scelerisque ac. <br></br><br></br> Aenean non tellus neque. Pellentesque ac ornare diam. Vestibulum varius vel tellus nec lobortis. Maecenas quis molestie massa, at accumsan lacus.  Duis dictum nibh nec sem rhoncus, eu pharetra sapien efficitur. Mauris venenatis interdum ipsum vitae accumsan. Sed vehicula sed nulla a condimentum. Aenean eget convallis leo. Proin auctor nisi neque, nec facilisis leo tincidunt sed. Vivamus aliquet euismod eros elementum iaculis. Suspendisse ut dignissim odio. Cras ut nisl ut nunc mattis egestas quis vitae quam. Nam vitae nunc at nulla consequat semper eu sed felis. Nunc efficitur leo nec nisl commodo, et suscipit ipsum consequat. Praesent sollicitudin accumsan nunc, eu dignissim felis laoreet quis. Nunc ullamcorper risus in ante fringilla pharetra. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. </MDBCardText>
-                      <p className = "mt-4"> Skills </p>  
+                    {session.user.id === id ? (
+                      <MDBCardTitle>Bio <i className={`bi ${isEditing ? 'bi-check-lg' : 'bi-pencil'}`} onClick={handleEditClick}></i></MDBCardTitle>
+                    ) : <MDBCardTitle>Bio</MDBCardTitle>}
+                      { isEditing ? (
+                        <div>
+                            <textarea value={editableBio} onChange={handleBioChange} style={{ width: '100%', resize: 'none' }} />
+                        </div>
+                        ) : (
+                            <MDBCardText dangerouslySetInnerHTML={{ __html: editableBio.replace(/\n/g, '<br />') }}></MDBCardText>
+                        )}
+                      <MDBCardTitle className = "mt-4"> Skills </MDBCardTitle>
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2">
-                        <div>
-                          <p className="mb-0 bg-primary rounded-pill p-2">Javascript</p>
-                        </div>
-                        <div className="px-3">
-                          <p className="mb-0 bg-primary rounded-pill p-2">HTML</p>
-                        </div>
-                        <div>
-                          <p className="mb-0 bg-primary rounded-pill p-2" style={{ minWidth: '80px' }}>CSS</p>
-                        </div>
+                        {skills.map(skill => (
+                          <div key={skill} className="me-2">
+                            <p className="mb-0 bg-primary rounded-pill p-2">{skill}
+                              {isEditing && <i className="bi bi-x-circle m-1" onClick={() => handleRemoveSkill(skill)}></i>}
+                            </p>
+                          </div>
+                        ))}
+                        {isEditing && (
+                            <div>
+                                <input type="text" placeholder="Add skill" onKeyDown={e => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault(); // Prevents the default form submission behavior
+                                        handleAddSkill(e.target.value);
+                                        e.target.value = ''; // Optionally clear the input after adding
+                                    }
+                                }} />
+                            </div>
+                        )}
                       </div>
                     </div>
                   </div>
