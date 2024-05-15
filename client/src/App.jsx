@@ -13,6 +13,8 @@ import Registration from "./pages/Registration";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ProfileDev from "./components/ProfileDev";
 import ProfileOrg from "./components/ProfileOrg"
+import ProjectCard from "./components/ProjectCard";
+import ProjectDetail from "./pages/ProjectDetail"
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -83,6 +85,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={isRegistered ? <Home session={session} /> : <Registration session={session} />} />
           <Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev session={session}/> : <ProfileOrg session={session}/>} />
+          <Route path="/project/:id" element= {<ProjectDetail session={session} />} />
         </Routes>
       </Router>
     );

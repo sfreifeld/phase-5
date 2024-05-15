@@ -28,7 +28,7 @@ function Home( { session }) {
         <NavBarMain className="fixed-top" session={session}></NavBarMain>
 
         {projects.map(project => (
-        <ProjectCard key={project.id} project={project} />
+        <ProjectCard key={project.id} project={project} session={session}/>
       ))}
     </div>
   );

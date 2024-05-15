@@ -7,7 +7,6 @@ import { supabase } from "../supabaseClient"
 
 function Registration( { session }) {
   const [activeForm, setActiveForm] = useState(null);
-  console.log(session)
 
   return (
     <div className="container m-5 p-5">

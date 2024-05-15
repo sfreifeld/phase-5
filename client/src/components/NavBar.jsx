@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient"
 
 function NavBarMain( { session }) {
-
+console.log(session)
     return (
         <Navbar bg="primary" data-bs-theme="dark">
             <Container>
