@@ -4,6 +4,7 @@ import { MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardTitle, MDBCardText, MDBCa
 import NavBarMain from "./NavBar";
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDropzone } from 'react-dropzone';
 
 export default function ProfileOrg({ session }) {
 
@@ -14,19 +15,55 @@ export default function ProfileOrg({ session }) {
   const [tags, setTags] = useState([])
   const { id } = useParams();
 
+  const {getRootProps, getInputProps} = useDropzone({
+    onDrop: acceptedFiles => {
+      const file = acceptedFiles[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      supabase
+        .storage
+        .from('avatars')
+        .upload(`${session.user.id}`, file, {
+          cacheControl: '3600',
+          upsert: true
+        })
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error uploading file:', error);
+          } else {
+            console.log('File uploaded successfully:', data);
+            // Optimistically update the profile picture URL in state
+            const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}?${new Date().getTime()}`;
+            setProfilePic(newProfilePicUrl);
+          }
+        });
+    }
+  });
+
+
+
+
+
+
+
+
 
   const handleEditClick = () => {
     if (isEditing) {
         supabase
             .from('organizations')
-            .update({ description: editableDescription })
+            .update({
+               description: editableDescription,
+               tags: tags 
+              })
             .eq('profile_id', session.user.id)
             .single()
             .then(({ data: updateData, error: updateError }) => {
                 if (updateError) {
-                    console.error('Error updating description:', updateError);
+                    console.error('Error updating org:', updateError);
                 } else {
-                        console.log('Description updated successfully:', updateData);
+                        console.log('Organization updated successfully:', updateData);
                     }
             })
         }
@@ -82,12 +119,16 @@ export default function ProfileOrg({ session }) {
 
 
   useEffect(() => {
-    if (orgData && orgData.description) {
+    if (orgData) {
+      if (orgData.description) {
         setEditableDescription(orgData.description);
-    } else {
-        setEditableDescription("This is your nonprofit description. You can write about your what your organization does, your mission statement, and what kind of work you're looking for!");
+      } else {
+        setEditableDescription("This is your nonprofit description. You can write about what your organization does, your mission statement, and what kind of work you're looking for!");
+      }
+      if (orgData.tags) {
+        setTags(orgData.tags)
+      }
     }
-
   }, [orgData]);
 
 
@@ -107,11 +148,17 @@ export default function ProfileOrg({ session }) {
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-shrink-0">
+                    {isEditing ? (
+                        <div {...getRootProps()} style={{ border: '2px dashed #007bff', padding: '20px', cursor: 'pointer', width: '180px'}}>
+                        <input {...getInputProps()} />
+                        <p className='fst-italic' >Drag 'n' drop a profile image here, or click to select a file</p>
+                        </div>
+                    ) : (
                       <MDBCardImage
                         style={{ width: '180px', borderRadius: '10px' }}
-                        src='https://marketplace.canva.com/EAFKWVyYMMw/1/0/1600w/canva-green-simple-international-day-of-charity-instagram-post-EVxZ49m2iZc.jpg'
+                        src={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}`}
                         alt='Generic placeholder image'
-                        fluid />
+                        fluid /> )}
                     </div>
                     <div className="flex-grow-1 ms-3">
                       { orgData && (
@@ -146,7 +193,7 @@ export default function ProfileOrg({ session }) {
             </MDBCol>
             {/* New card to the right */}
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px' }}>
+              <MDBCard style={{ borderRadius: '15px', height: '100%'}}>
                 <MDBCardBody className="p-4">
                       <MDBCardTitle>Previous Projects</MDBCardTitle>
                       <ul>
@@ -209,4 +256,5 @@ export default function ProfileOrg({ session }) {
       </div>
     );
   }
+  
   

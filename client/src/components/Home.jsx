@@ -1,14 +1,35 @@
 import { supabase } from "../supabaseClient"
 import NavBarMain from "./NavBar";
+import ProjectCard from "./ProjectCard"
+import React, { useState, useEffect } from 'react';
 
 
 function Home( { session }) {
-    console.log(session)
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    supabase
+      .from('projects')
+      .select('*')
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Error fetching projects:', error);
+        } else {
+          setProjects(data);
+        }
+      });
+  }, []);
+
+
+
+
   return (
-    <div>
-        <NavBarMain session={session}></NavBarMain>
-        <div>Logged in!</div>
-        <button onClick={() => supabase.auth.signOut()}>Sign out</button>
+    <div className="vh-100 vw-100">
+        <NavBarMain className="fixed-top" session={session}></NavBarMain>
+
+        {projects.map(project => (
+        <ProjectCard key={project.id} project={project} />
+      ))}
     </div>
   );
 }

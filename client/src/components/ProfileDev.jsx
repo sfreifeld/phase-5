@@ -4,27 +4,60 @@ import { MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardTitle, MDBCardText, MDBCa
 import NavBarMain from "./NavBar";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useParams } from 'react-router-dom';
+import { useDropzone } from 'react-dropzone';
 
 export default function ProfileDev({ session }) {
+    
     const [userData, setUserData] = useState(null)
     const [projects, setProjects] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [editableBio, setEditableBio] = useState("Here is your bio.  You can write about your educational experience, your skills, and what you want to work on!");
     const [skills, setSkills] = useState([])
+    const [profilepic, setProfilePic] = useState('https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp')
     const { id } = useParams();
+
+    const {getRootProps, getInputProps} = useDropzone({
+        onDrop: acceptedFiles => {
+          const file = acceptedFiles[0];
+          const formData = new FormData();
+          formData.append('file', file);
+    
+          supabase
+            .storage
+            .from('avatars')
+            .upload(`${session.user.id}`, file, {
+              cacheControl: '3600',
+              upsert: true
+            })
+            .then(({ data, error }) => {
+              if (error) {
+                console.error('Error uploading file:', error);
+              } else {
+                console.log('File uploaded successfully:', data);
+                // Optimistically update the profile picture URL in state
+                const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}?${new Date().getTime()}`;
+                setProfilePic(newProfilePicUrl);
+              }
+            });
+        }
+      });
+    
 
     const handleEditClick = () => {
         if (isEditing) {
             supabase
                 .from('users')
-                .update({ bio: editableBio })
+                .update({
+                     bio: editableBio,
+                     skills: skills 
+                    })
                 .eq('profile_id', session.user.id)
                 .single()
                 .then(({ data: updateData, error: updateError }) => {
                     if (updateError) {
-                        console.error('Error updating profile:', updateError);
+                        console.error('Error updating user:', updateError);
                     } else {
-                            console.log('Bio updated successfully:', updateData);
+                            console.log('User updated successfully:', updateData);
                         }
                 })
             }
@@ -79,17 +112,23 @@ export default function ProfileDev({ session }) {
 
 
     useEffect(() => {
-        if (userData && userData.bio) {
+        if (userData) {
+          if (userData.bio) {
             setEditableBio(userData.bio);
-        } else {
+          } else {
             setEditableBio("Here is your bio. You can write about your educational experience, your skills, and what you want to work on!");
-        }
-
-        if (userData && userData.skills) {
+          }
+          if (userData.skills) {
             setSkills(userData.skills)
+          }
         }
+      }, [userData]);
 
-    }, [userData]);
+
+
+
+
+    
 
 
     return (
@@ -102,11 +141,17 @@ export default function ProfileDev({ session }) {
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-shrink-0">
+                    {isEditing ? (
+                        <div {...getRootProps()} style={{ border: '2px dashed #007bff', padding: '20px', cursor: 'pointer', width: '180px'}}>
+                        <input {...getInputProps()} />
+                        <p className='fst-italic' >Drag 'n' drop a profile image here, or click to select a file</p>
+                        </div>
+                    ) : (
                       <MDBCardImage
                         style={{ width: '180px', borderRadius: '10px' }}
-                        src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp'
+                        src={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}`}
                         alt='Generic placeholder image'
-                        fluid />
+                        fluid /> )}
                     </div>
                     <div className="flex-grow-1 ms-3">
                     { userData && (

@@ -17,6 +17,7 @@ import ProfileOrg from "./components/ProfileOrg"
 export default function App() {
   const [session, setSession] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [userType, setUserType] = useState('')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -55,6 +56,12 @@ export default function App() {
       const userExists = !userResult.error && userResult.data !== null;
       const organizationExists = !organizationResult.error && organizationResult.data !== null;
       setIsRegistered(userExists || organizationExists);
+      if (userExists) {
+        setUserType('dev')
+      }
+      else if (organizationExists) {
+        setUserType('org')
+      }
     });
   };
 
@@ -75,7 +82,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={isRegistered ? <Home session={session} /> : <Registration session={session} />} />
-          <Route path="/profile/:Id" element={<ProfileOrg session={session}/>}/>
+          <Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev session={session}/> : <ProfileOrg session={session}/>} />
         </Routes>
       </Router>
     );
