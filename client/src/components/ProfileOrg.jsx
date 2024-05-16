@@ -42,13 +42,6 @@ export default function ProfileOrg({ session }) {
   });
 
 
-
-
-
-
-
-
-
   const handleEditClick = () => {
     if (isEditing) {
         supabase
@@ -139,7 +132,7 @@ export default function ProfileOrg({ session }) {
 
     return (
       <div className="vh-100 vw-100" style={{ backgroundColor: '#e6ffe6' }}>
-        <NavBarMain session={session}></NavBarMain>
+        <NavBarMain session={session} ></NavBarMain>
         <MDBContainer>
           <MDBRow className="justify-content-left">
 

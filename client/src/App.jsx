@@ -1,4 +1,4 @@
-import "./index.css";
+
 import { useState, useEffect } from "react";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -10,11 +10,16 @@ import {
 } from 'react-router-dom';
 import Home from "./components/Home";
 import Registration from "./pages/Registration";
-import 'bootstrap/dist/css/bootstrap.min.css';
+
 import ProfileDev from "./components/ProfileDev";
 import ProfileOrg from "./components/ProfileOrg"
 import ProjectCard from "./components/ProjectCard";
 import ProjectDetail from "./pages/ProjectDetail"
+import CreateProject from "./components/CreateProject"
+
+import { UserTypeProvider, useUserType } from './components/UserTypeContext'; // Import the provider
+
+
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -81,13 +86,17 @@ export default function App() {
     );
   } else {
     return (
-      <Router>
-        <Routes>
-          <Route path="/" element={isRegistered ? <Home session={session} /> : <Registration session={session} />} />
-          <Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev session={session}/> : <ProfileOrg session={session}/>} />
-          <Route path="/project/:id" element= {<ProjectDetail session={session} />} />
-        </Routes>
-      </Router>
+      <UserTypeProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={isRegistered ? <Home session={session}/> : <Registration session={session} />} />
+            {/*<Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev session={session}/> : <ProfileOrg session={session}/>} /> */}
+            <Route path="/profile/:id" element={userType === 'dfsfkmal' ? <ProfileDev session={session}/> : <ProfileOrg session={session}/>} />
+            <Route path="/project/:id" element= {<ProjectDetail  session={session} />} />
+            <Route path="/createproject" element= {<CreateProject session={session} />} />
+          </Routes>
+        </Router>
+      </UserTypeProvider>
     );
   }
 }
