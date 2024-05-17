@@ -60,7 +60,7 @@ export const SessionProvider = ({ children }) => {
 
 
     return (
-        <SessionContext.Provider value={session}>
+        <SessionContext.Provider value={{session, user, userType}}>
             {children}
         </SessionContext.Provider>
     );

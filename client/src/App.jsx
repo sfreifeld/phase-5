@@ -17,7 +17,7 @@ import ProjectCard from "./components/ProjectCard";
 import ProjectDetail from "./pages/ProjectDetail"
 import CreateProject from "./components/CreateProject"
 
-import { UserTypeProvider, useUserType } from './components/UserTypeContext'; // Import the provider
+
 
 
 

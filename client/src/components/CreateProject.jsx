@@ -1,15 +1,9 @@
 import { supabase } from "../supabaseClient"
 import NavBarMain from "./NavBar";
-import ProjectCard from "./ProjectCard"
 import React, { useState, useEffect } from 'react';
-import SearchBar from "./SearchBar";
 import { Button } from 'react-bootstrap';
-import HomeHero from "./HomeHero";
-import { useLocation } from 'react-router-dom'; // Import useLocation
 
 function CreateProject() {
-  const location = useLocation(); // Use the useLocation hook to access location object // Destructure session from location.state, defaulting to an empty object if undefined
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [projectType, setProjectType] = useState('');
