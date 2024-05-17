@@ -7,12 +7,10 @@ import { useLocation } from 'react-router-dom';
 function ProjectDetail() {
 
     const location = useLocation();
-    const { session } = location.state || {};
-
 
     return (
         <div className='vh-100 vw-100'>
-            <NavBarMain className="fixed-top" session={session}/>
+            <NavBarMain className="fixed-top"/>
             <Card className='m-5'>
                 <Card.Title>Project Title</Card.Title>
                 <div className='d-flex flex-row'>

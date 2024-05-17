@@ -5,7 +5,7 @@ import RegistrationOrg from '../components/RegistrationOrg';
 import { supabase } from "../supabaseClient"
 
 
-function Registration( { session }) {
+function Registration() {
   const [activeForm, setActiveForm] = useState(null);
 
   return (
@@ -27,8 +27,8 @@ function Registration( { session }) {
           Nonprofit
         </button>
       </div>
-      {activeForm === 'developer' && <RegistrationDev session={session} />}
-      {activeForm === 'nonprofit' && <RegistrationOrg session={session} />}
+      {activeForm === 'developer' && <RegistrationDev />}
+      {activeForm === 'nonprofit' && <RegistrationOrg/>}
     </div>
   );
 }

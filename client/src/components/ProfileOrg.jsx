@@ -5,8 +5,9 @@ import NavBarMain from "./NavBar";
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import { useSession } from './SessionContext';
 
-export default function ProfileOrg({ session }) {
+export default function ProfileOrg() {
 
   const [orgData, setOrgData] = useState(null)
   const [projects, setProjects] = useState([]);
@@ -14,6 +15,8 @@ export default function ProfileOrg({ session }) {
   const [editableDescription, setEditableDescription] = useState("This is your nonprofit summary.  Here you can write what your organization does, your mission statement, what kind of work you're looking for, and anything else!");
   const [tags, setTags] = useState([])
   const { id } = useParams();
+  const session = useSession();
+
 
   const {getRootProps, getInputProps} = useDropzone({
     onDrop: acceptedFiles => {
@@ -132,7 +135,7 @@ export default function ProfileOrg({ session }) {
 
     return (
       <div className="vh-100 vw-100" style={{ backgroundColor: '#e6ffe6' }}>
-        <NavBarMain session={session} ></NavBarMain>
+        <NavBarMain ></NavBarMain>
         <MDBContainer>
           <MDBRow className="justify-content-left">
 

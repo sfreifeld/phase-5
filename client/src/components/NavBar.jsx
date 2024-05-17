@@ -5,10 +5,11 @@ import Button from 'react-bootstrap/Button';
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient"
 import { Link } from 'react-router-dom'; // Import Link
-import { useUserType } from './UserTypeContext';
+import { useSession } from './SessionContext';
 
-function NavBarMain( { session }) {
-    const { userType, setUserType } = useUserType();
+function NavBarMain() {
+    const { session, user, userType } = useSession();
+
 
 
     return (

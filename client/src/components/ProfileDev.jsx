@@ -5,8 +5,9 @@ import NavBarMain from "./NavBar";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import { useSession } from './SessionContext'
 
-export default function ProfileDev({ session }) {
+export default function ProfileDev() {
     
     const [userData, setUserData] = useState(null)
     const [projects, setProjects] = useState([]);
@@ -15,6 +16,7 @@ export default function ProfileDev({ session }) {
     const [skills, setSkills] = useState([])
     const [profilepic, setProfilePic] = useState('https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp')
     const { id } = useParams();
+    const session = useSession();
 
     const {getRootProps, getInputProps} = useDropzone({
         onDrop: acceptedFiles => {
@@ -133,7 +135,7 @@ export default function ProfileDev({ session }) {
 
     return (
       <div className="vh-100 vw-100" style={{ backgroundColor: '#9de2ff' }}>
-        <NavBarMain session={session}></NavBarMain>
+        <NavBarMain></NavBarMain>
         <MDBContainer>
           <MDBRow className="justify-content-left d-flex align-items-stretch">
             <MDBCol md="6" lg="6" xl="6" className="mt-5">

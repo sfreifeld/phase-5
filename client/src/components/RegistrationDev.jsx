@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { supabase } from "../supabaseClient"
+import { useSession } from './SessionContext';
 
 function transferProfileDataToUserTable(userId, username, fullName) {
   supabase
@@ -32,8 +33,9 @@ function transferProfileDataToUserTable(userId, username, fullName) {
 };
 
 
-function RegistrationDev( { session }) {
+function RegistrationDev() {
   const [errors, setErrors] = useState({});
+  const session = useSession();
 
   const validateUsername = (username) => {
     const regex = /^[A-Za-z0-9]{6,20}$/; // Regex to check the username criteria

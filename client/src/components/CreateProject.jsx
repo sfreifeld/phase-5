@@ -8,8 +8,7 @@ import HomeHero from "./HomeHero";
 import { useLocation } from 'react-router-dom'; // Import useLocation
 
 function CreateProject() {
-  const location = useLocation(); // Use the useLocation hook to access location object
-  const { session } = location.state || {}; // Destructure session from location.state, defaulting to an empty object if undefined
+  const location = useLocation(); // Use the useLocation hook to access location object // Destructure session from location.state, defaulting to an empty object if undefined
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -34,7 +33,7 @@ function CreateProject() {
 
   return (
     <div className="vh-100 vw-100">
-      <NavBarMain className="fixed-top " session={session}></NavBarMain>
+      <NavBarMain className="fixed-top "></NavBarMain>
       <div className='d-flex justify-content-center align-items-center m-5 p-5 border'> {/* Adjust width as needed */}
         <form onSubmit={handleSubmit}>
             <div className="mb-3">

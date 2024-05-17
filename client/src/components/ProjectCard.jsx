@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 
 
-function ProjectCard({project, session}) {
+function ProjectCard({project}) {
     const navigate = useNavigate(); 
     const tags = project.tags
 
     const handleDetailsClick = () => {
-        navigate(`/project/${project.id}`, { state: { project: project, session: session } }) // Navigate to /project when button is clicked
+        navigate(`/project/${project.id}`, { state: { project: project} }) // Navigate to /project when button is clicked
     };
 
     return (

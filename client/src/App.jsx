@@ -21,10 +21,13 @@ import { UserTypeProvider, useUserType } from './components/UserTypeContext'; //
 
 
 
+
 export default function App() {
   const [session, setSession] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
   const [userType, setUserType] = useState('')
+
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -89,11 +92,11 @@ export default function App() {
       <UserTypeProvider>
         <Router>
           <Routes>
-            <Route path="/" element={isRegistered ? <Home session={session}/> : <Registration session={session} />} />
-            {/*<Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev session={session}/> : <ProfileOrg session={session}/>} /> */}
-            <Route path="/profile/:id" element={userType === 'dfsfkmal' ? <ProfileDev session={session}/> : <ProfileOrg session={session}/>} />
-            <Route path="/project/:id" element= {<ProjectDetail  session={session} />} />
-            <Route path="/createproject" element= {<CreateProject session={session} />} />
+            <Route path="/" element={isRegistered ? <Home/> : <Registration />} />
+            {/*<Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev/> : <ProfileOrg/>} /> */}
+            <Route path="/profile/:id" element={userType === 'dfsfkmal' ? <ProfileDev/> : <ProfileOrg/>} />
+            <Route path="/project/:id" element= {<ProjectDetail />} />
+            <Route path="/createproject" element= {<CreateProject />} />
           </Routes>
         </Router>
       </UserTypeProvider>

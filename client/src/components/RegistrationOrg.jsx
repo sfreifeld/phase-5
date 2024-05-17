@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { supabase } from "../supabaseClient"
+import { useSession } from './SessionContext';
 
 function transferProfileDataToOrgTable(orgId, orgName, websiteUrl, sector) {
   supabase
@@ -31,7 +32,8 @@ function transferProfileDataToOrgTable(orgId, orgName, websiteUrl, sector) {
     });
 };
 
-function RegistrationOrg( { session }) {
+function RegistrationOrg() {
+  const session = useSession();
 
 
   const handleSubmit = (event) => {

@@ -6,7 +6,7 @@ import SearchBar from "./SearchBar";
 import { Button } from 'react-bootstrap';
 import HomeHero from "./HomeHero";
 
-function Home( { session }) {
+function Home( ) {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
@@ -27,11 +27,11 @@ function Home( { session }) {
 
   return (
     <div className="vh-100 vw-100">
-        <NavBarMain className="fixed-top" session={session}></NavBarMain>
+        <NavBarMain className="fixed-top"></NavBarMain>
         <HomeHero className=""></HomeHero>
         <SearchBar className=""/>
         {projects.map(project => (
-        <ProjectCard key={project.id} project={project} session={session}/>
+        <ProjectCard key={project.id} project={project}/>
       ))}
 
     </div>
