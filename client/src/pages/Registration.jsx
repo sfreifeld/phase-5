@@ -27,7 +27,7 @@ function Registration() {
           Nonprofit
         </button>
       </div>
-      {activeForm === 'developer' && <RegistrationDev />}
+     {activeForm === 'developer' && <RegistrationDev />}
       {activeForm === 'nonprofit' && <RegistrationOrg/>}
     </div>
   );

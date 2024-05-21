@@ -6,6 +6,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useSession } from './SessionContext'
+import { Link } from 'react-router-dom';
 
 export default function ProfileDev() {
     
@@ -16,7 +17,9 @@ export default function ProfileDev() {
     const [skills, setSkills] = useState([])
     const [profilepic, setProfilePic] = useState('https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp')
     const { id } = useParams();
-    const session = useSession();
+    const { session, user } = useSession();
+    const [applications, setApplications] = useState([])
+
 
     const {getRootProps, getInputProps} = useDropzone({
         onDrop: acceptedFiles => {
@@ -43,6 +46,26 @@ export default function ProfileDev() {
             });
         }
       });
+
+
+
+      const handleDeleteApplication = (projectId, userId) => {
+        if (window.confirm("Are you sure you want to withdraw your application?  This action cannot be undone.")) {
+          supabase
+            .from('applicants')
+            .delete()
+            .eq('project_id', projectId)
+            .eq('user_id', userId)
+            .then(({ error }) => {
+              if (error) {
+                console.error('Error deleting project:', error);
+              } else {
+                setApplications(prevApplications=> prevApplications.filter(application => application.id !== projectId));
+                console.log('Application deleted successfully');
+              }
+            });
+        }
+      }
     
 
     const handleEditClick = () => {
@@ -111,6 +134,47 @@ export default function ProfileDev() {
                 });
         }
     }, [session]);
+
+
+    useEffect(() => {
+        if (user) {
+            supabase
+                .from('applicants')
+                .select('*')
+                .eq('user_id', user.id)
+                .then(({ data: applicationData, error: userError }) => {
+                    if (userError) {
+                        console.error('Error fetching user data:', userError);
+                        return;
+                    }
+                    else {
+                        if (applicationData.length > 0) {
+                            const fetchedProjects = [];
+                            applicationData.forEach((application, index, array) => {
+                                supabase
+                                    .from('projects')
+                                    .select('*')
+                                    .eq('id', application.project_id)
+                                    .then(({ data: projectData, error: projectError }) => {
+                                        if (projectError) {
+                                            console.error('Error fetching project data:', projectError);
+                                        } else {
+                                            console.log('Project data:', projectData);
+                                            fetchedProjects.push(...projectData); // Assuming projectData is an array
+                                            // Check if all requests have been processed
+                                            if (fetchedProjects.length === array.length) {
+                                                setApplications(fetchedProjects);
+                                            }
+                                        }
+                                    });
+                            });
+                        } else {
+                            console.log('No applications found for this user.');
+                        }
+                    }
+                });
+        }
+    }, [user]); // Depend on user to re-run this effect when user changes
 
 
     useEffect(() => {
@@ -187,22 +251,60 @@ export default function ProfileDev() {
               </MDBCard>
             </MDBCol>
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px', height: '100%' }}>
+              <MDBCard style={{ borderRadius: '15px', height: '100%'}}>
                 <MDBCardBody className="p-4">
-                  <MDBCardTitle>Previous Projects</MDBCardTitle>
-                  <ul>
-                    {projects && projects.length > 0 ? (
-                        projects.map(project => (
-                            <li key={project.id}>{project.title}</li>
-                        ))
-                    ) : (
-                        <div>No projects done yet!</div>
-                    )}
-                  </ul>
+                  <MDBRow>
+                    <MDBCol md="6">
+                      <MDBCardTitle>Previous Projects</MDBCardTitle>
+                      <ul>
+                        {projects && projects.length > 0 ? (
+                            projects.filter(project => project.status !== 'open').map(project => (
+                              <li key={project.id}>
+                                <Link to={`/project/${project.id}`}>{project.title}</Link>
+                            </li>
+                            ))
+                        ) : (
+                            <div>No previous projects!</div>
+                        )}
+                      </ul>
+                    </MDBCol>
+                    <MDBCol md="6">
+                      <MDBCardTitle>Current Projects</MDBCardTitle>
+                      <ul>
+                        {projects && projects.length > 0 ? (
+                            projects.filter(project => project.status === 'open').map(project => (
+                              <li key={project.id}>
+                                <div className="d-flex flex-row">
+                                  <Link to={`/project/${project.id}`}>{project.title}</Link>
+                                </div>
+                              </li>
+                            ))
+                        ) : (
+                            <div>No current projects!</div>
+                        )}
+                      </ul>
+                      <MDBCardTitle>Open Applications</MDBCardTitle>
+                      <ul>
+                      {applications && applications.length > 0 ? (
+                            applications.filter(application => application.user_id == null).map(application => (
+                              <li key={application.id}>
+                                <div className="d-flex flex-row">
+                                  <Link to={`/project/${application.id}`}>{application.title}</Link>
+                                  { isEditing ? <i className='bi bi-x-circle m-1' style={{ cursor: 'pointer' }} onClick={() => handleDeleteApplication(application.id, user.id)}/> : '' }
+                                </div>
+                              </li>
+                            ))
+                        ) : (
+                            <div>No current projects!</div>
+                        )}
+                        </ul>
+                    </MDBCol>
+                  </MDBRow>
                 </MDBCardBody>
               </MDBCard>
             </MDBCol>
           </MDBRow>
+  
           <MDBRow className="justify-content-left">
             <MDBCol md="12" lg="12" xl="12" className="mt-5">
               <MDBCard style={{ borderRadius: '15px' }}>

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useSession } from './SessionContext';
+import { Link } from 'react-router-dom';
 
 export default function ProfileOrg() {
 
@@ -15,7 +16,7 @@ export default function ProfileOrg() {
   const [editableDescription, setEditableDescription] = useState("This is your nonprofit summary.  Here you can write what your organization does, your mission statement, what kind of work you're looking for, and anything else!");
   const [tags, setTags] = useState([])
   const { id } = useParams();
-  const session = useSession();
+  const { session } = useSession();
 
 
   const {getRootProps, getInputProps} = useDropzone({
@@ -82,6 +83,24 @@ export default function ProfileOrg() {
       setEditableDescription(event.target.value);
   };
 
+
+  const handleDeleteProject = (projectId) => {
+    if (window.confirm("Are you sure you want to delete this project?  This action is irreversible.")) {
+      supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId)
+        .then(({ error }) => {
+          if (error) {
+            console.error('Error deleting project:', error);
+          } else {
+            setProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
+            console.log('Project deleted successfully');
+          }
+        });
+    }
+  }
+
   useEffect(() => {
     if (session) {
         supabase
@@ -140,7 +159,7 @@ export default function ProfileOrg() {
           <MDBRow className="justify-content-left">
 
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px' }}>
+              <MDBCard className="custom-card" style={{ borderRadius: '15px' }}>
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-shrink-0">
@@ -189,25 +208,48 @@ export default function ProfileOrg() {
             </MDBCol>
             {/* New card to the right */}
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px', height: '100%'}}>
+              <MDBCard className="custom-card" style={{ borderRadius: '15px', height: '100%'}}>
                 <MDBCardBody className="p-4">
+                  <MDBRow>
+                    <MDBCol md="6">
                       <MDBCardTitle>Previous Projects</MDBCardTitle>
                       <ul>
                         {projects && projects.length > 0 ? (
-                            projects.map(project => (
-                                <li key={project.id}>{project.title}</li>
+                            projects.filter(project => project.status !== 'open').map(project => (
+                              <li key={project.id}>
+                                <Link to={`/project/${project.id}`}>{project.title}</Link>
+                            </li>
                             ))
                         ) : (
-                            <div>No projects done yet!</div>
+                            <div>No previous projects!</div>
                         )}
                       </ul>
+                    </MDBCol>
+                    <MDBCol md="6">
+                      <MDBCardTitle>Current Projects</MDBCardTitle>
+                      <ul>
+                        {projects && projects.length > 0 ? (
+                            projects.filter(project => project.status === 'open').map(project => (
+                              <li key={project.id}>
+                                <div className="d-flex flex-row">
+                                  <Link to={`/project/${project.id}`}>{project.title}</Link>
+                                  { isEditing ? <i className='bi bi-x-circle m-1' style={{ cursor: 'pointer' }} onClick={() => handleDeleteProject(project.id)}/> : '' }
+                                </div>
+                              </li>
+                            ))
+                        ) : (
+                            <div>No current projects!</div>
+                        )}
+                      </ul>
+                    </MDBCol>
+                  </MDBRow>
                 </MDBCardBody>
               </MDBCard>
             </MDBCol>
           </MDBRow>
           <MDBRow className="justify-content-left">
             <MDBCol md="12" lg="12" xl="12" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px' }}>
+              <MDBCard className="custom-card" style={{ borderRadius: '15px' }}>
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-grow-1 ms-3">
@@ -252,5 +294,8 @@ export default function ProfileOrg() {
       </div>
     );
   }
+  
+  
+  
   
   

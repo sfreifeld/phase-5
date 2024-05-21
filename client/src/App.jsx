@@ -89,17 +89,14 @@ export default function App() {
     );
   } else {
     return (
-      <UserTypeProvider>
         <Router>
           <Routes>
             <Route path="/" element={isRegistered ? <Home/> : <Registration />} />
-            {/*<Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev/> : <ProfileOrg/>} /> */}
-            <Route path="/profile/:id" element={userType === 'dfsfkmal' ? <ProfileDev/> : <ProfileOrg/>} />
+            <Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev/> : <ProfileOrg/>} />
             <Route path="/project/:id" element= {<ProjectDetail />} />
             <Route path="/createproject" element= {<CreateProject />} />
           </Routes>
         </Router>
-      </UserTypeProvider>
     );
   }
 }

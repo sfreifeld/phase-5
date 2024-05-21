@@ -26,7 +26,7 @@ function Home( ) {
 
 
   return (
-    <div className="vh-100 vw-100">
+    <div className="min-vh-100 vw-100 background">
         <NavBarMain className="fixed-top"></NavBarMain>
         <HomeHero className=""></HomeHero>
         <SearchBar className=""/>

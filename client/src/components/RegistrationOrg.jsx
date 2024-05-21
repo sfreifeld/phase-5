@@ -33,7 +33,7 @@ function transferProfileDataToOrgTable(orgId, orgName, websiteUrl, sector) {
 };
 
 function RegistrationOrg() {
-  const session = useSession();
+  const {session} = useSession();
 
 
   const handleSubmit = (event) => {

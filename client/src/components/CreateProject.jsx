@@ -2,11 +2,15 @@ import { supabase } from "../supabaseClient"
 import NavBarMain from "./NavBar";
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
+import { useSession } from './SessionContext';
 
 function CreateProject() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [projectType, setProjectType] = useState('');
+  const { session, user, userType } = useSession();
+  const [message, setMessage] = useState('')
+
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submit behavior
@@ -14,13 +18,14 @@ function CreateProject() {
     const { data, error } = await supabase
       .from('projects') // Replace 'projects' with your actual table name
       .insert([
-        { title: title, description: description, project_type: projectType }
+        { title: title, description: description, project_length: projectType, org_id: user.id, status: 'open' }
       ]);
 
     if (error) {
       console.error('Error inserting data: ', error);
     } else {
       console.log('Data inserted successfully: ', data);
+      setMessage("Your project has successfully been created!")
       // Optionally reset form or redirect user
     }
   };
@@ -59,12 +64,13 @@ function CreateProject() {
                   value={projectType}
                   onChange={(e) => setProjectType(e.target.value)}
                 >
-                    <option value="type1">1-3 Weeks</option>
-                    <option value="type2">4-6 Weeks</option>
-                    <option value="type3">7+ Weeks</option>
+                    <option value="1-3 Weeks">1-3 Weeks</option>
+                    <option value="4-6 Weeks">4-6 Weeks</option>
+                    <option value="7+ Weeks">7+ Weeks</option>
                 </select>
             </div>
             <button type="submit" className="btn btn-primary">Submit</button>
+            <div className="text-success">{message}</div>
         </form>
       </div>
     </div>

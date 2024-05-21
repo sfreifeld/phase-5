@@ -24,7 +24,7 @@ function NavBarMain() {
                     <Link to={{
                         pathname: "/createproject",
                         state: { session: session }
-                    }} className='btn nav-link'>Create Project +</Link>
+                    }} className='btn nav-link text-white'>Create Project +</Link>
             </Nav>
             <Button variant="outline-light" onClick={() => supabase.auth.signOut()}>Sign out</Button>
             </Container>

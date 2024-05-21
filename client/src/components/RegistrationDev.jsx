@@ -4,38 +4,39 @@ import Form from 'react-bootstrap/Form';
 import { supabase } from "../supabaseClient"
 import { useSession } from './SessionContext';
 
-function transferProfileDataToUserTable(userId, username, fullName) {
-  supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)  // Filter to get only the newly signed up user's profile
-    .then(({ data: profilesData, error: selectError }) => {
-      if (selectError) {
-        console.error('Error fetching profile:', selectError);
-      } else if (profilesData.length > 0) {
-        const profile = profilesData[0];  // Assuming there's only one profile per user
-        supabase
-          .from('users')
-          .insert([
-            { profile_id: profile.id, username: username, full_name: fullName }
-          ])
-          .then(({ data: insertData, error: insertError }) => {
-            if (insertError) {
-              console.error('Error inserting data into users table:', insertError);
-            } else {
-              console.log('Data added successfully to users table:', insertData);
-            }
-          });
-      } else {
-        console.log('No profile found for the user:', userId);
-      }
-    });
-};
 
 
 function RegistrationDev() {
   const [errors, setErrors] = useState({});
-  const session = useSession();
+  const { session, user } = useSession();
+
+  function transferProfileDataToUserTable(userId, username, fullName) {
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)  // Filter to get only the newly signed up user's profile
+      .then(({ data: profilesData, error: selectError }) => {
+        if (selectError) {
+          console.error('Error fetching profile:', selectError);
+        } else if (profilesData.length > 0) {
+          const profile = profilesData[0];  // Assuming there's only one profile per user
+          supabase
+            .from('users')
+            .insert([
+              { profile_id: profile.id, username: username, full_name: fullName}
+            ])
+            .then(({ data: insertData, error: insertError }) => {
+              if (insertError) {
+                console.error('Error inserting data into users table:', insertError);
+              } else {
+                console.log('Data added successfully to users table:', insertData);
+              }
+            });
+        } else {
+          console.log('No profile found for the user:', userId);
+        }
+      });
+  };
 
   const validateUsername = (username) => {
     const regex = /^[A-Za-z0-9]{6,20}$/; // Regex to check the username criteria
