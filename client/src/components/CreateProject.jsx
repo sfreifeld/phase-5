@@ -3,6 +3,7 @@ import NavBarMain from "./NavBar";
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { useSession } from './SessionContext';
+import backgroundImage from '../assets/background.jpg'
 
 function CreateProject() {
   const [title, setTitle] = useState('');
@@ -10,6 +11,7 @@ function CreateProject() {
   const [projectType, setProjectType] = useState('');
   const { session, user, userType } = useSession();
   const [message, setMessage] = useState('')
+  const [tags, setTags] = useState('')
 
 
   const handleSubmit = async (event) => {
@@ -18,7 +20,7 @@ function CreateProject() {
     const { data, error } = await supabase
       .from('projects') // Replace 'projects' with your actual table name
       .insert([
-        { title: title, description: description, project_length: projectType, org_id: user.id, status: 'open' }
+        { title: title, description: description, project_length: projectType, tags: tags.split(',').map(tag => tag.trim()), org_id: user.id, status: 'open' }
       ]);
 
     if (error) {
@@ -26,15 +28,19 @@ function CreateProject() {
     } else {
       console.log('Data inserted successfully: ', data);
       setMessage("Your project has successfully been created!")
-      // Optionally reset form or redirect user
+      // Reset form fields
+      setTitle('');
+      setDescription('');
+      setProjectType('');
+      setTags('');
     }
   };
 
   return (
-    <div className="vh-100 vw-100">
+    <div className="vh-100 vw-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
       <NavBarMain className="fixed-top "></NavBarMain>
-      <div className='d-flex justify-content-center align-items-center m-5 p-5 border'> {/* Adjust width as needed */}
-        <form onSubmit={handleSubmit}>
+      <div className='d-flex justify-content-center align-items-center m-5 p-5'> {/* Adjust width as needed */}
+        <form  className="custom-card m-3 p-5" onSubmit={handleSubmit}>
             <div className="mb-3">
                 <label htmlFor="inputProjectTitle" className="form-label">Project Title</label>
                 <input
@@ -68,6 +74,16 @@ function CreateProject() {
                     <option value="4-6 Weeks">4-6 Weeks</option>
                     <option value="7+ Weeks">7+ Weeks</option>
                 </select>
+            </div>
+            <div className="mb-3">
+                <label htmlFor="inputProjectTags" className="form-label">Tags (separate with commas)</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="inputProjectTags"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                />
             </div>
             <button type="submit" className="btn btn-primary">Submit</button>
             <div className="text-success">{message}</div>

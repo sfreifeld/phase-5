@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useSession } from './SessionContext';
 import { Link } from 'react-router-dom';
+import backgroundImage from '../assets/background-org.jpg';
 
 export default function ProfileOrg() {
 
@@ -153,7 +154,7 @@ export default function ProfileOrg() {
 
 
     return (
-      <div className="vh-100 vw-100" style={{ backgroundColor: '#e6ffe6' }}>
+      <div className="vh-100 vw-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <NavBarMain ></NavBarMain>
         <MDBContainer>
           <MDBRow className="justify-content-left">
@@ -179,7 +180,7 @@ export default function ProfileOrg() {
                       { orgData && (
                       <>
                         <MDBCardTitle>{orgData.org_name}</MDBCardTitle>
-                        <MDBCardText>{orgData.website_url}</MDBCardText>
+                        <MDBCardText><a href={orgData.website_url}>{orgData.website_url}</a></MDBCardText>
                       </>
                         )}
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2"
