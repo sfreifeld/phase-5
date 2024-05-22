@@ -3,16 +3,13 @@
 
 
 // Override Bootstrap's default variables
-$primary: #6495ED; // Blue
-$secondary: #d8f7ff; // Gray
-$success: #28a745; // Green
-
+$primary: #6495ED; // Cobalt Blue
+$secondary: #d8f7ff; // Light blue
 $font:  #28282d;
 
-// You can add new custom colors
-$custom-color: #551A8B; // Custom Purple
 
-// Import Bootstrap's source files
+
+
 @import '../node_modules/bootstrap/scss/bootstrap';
 
 
@@ -20,16 +17,15 @@ $custom-color: #551A8B; // Custom Purple
 html, body {
     font-family: 'Lato', sans-serif;
     color: $font;
-    height: 100%; /* or min-height: 100vh; */
+    height: 100%;
     margin: 0;
     padding: 0;
   }
 
 
 
-// Custom class using Bootstrap mixins or variables
 .btn {
-    background-color: $primary; // Use a direct color to test
+    background-color: $primary;
     align-items: center;
     font-family: 'Karla', sans-serif;
     font-weight: 400;

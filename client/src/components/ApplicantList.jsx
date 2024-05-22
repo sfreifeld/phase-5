@@ -8,14 +8,16 @@ function ApplicantList() {
     const { id } = useParams();
     const [applicants, setApplicants] = useState([]);
     const [selectedApplicant, setSelectedApplicant] = useState(null);
-    const { session } = useSession();
     const [ status , setStatus] = useState('')
     const [ dev, setDev] = useState({})
 
+
+    //Helper function to change status value to correct capitalization
     function capitalizeWords(str) {
         return str.replace(/\b\w/g, char => char.toUpperCase());
     }
-
+    
+    //Helper function to get right color for text, based on project status
     function getStatusColor(status) {
         switch (status) {
             case 'open':
@@ -25,10 +27,13 @@ function ApplicantList() {
             case 'closed':
                 return 'black';
             default:
-                return 'black'; // Default color if status is undefined or not one of the expected values
+                return 'black';
         }
     }
-    
+
+
+
+    //Gets status of project and which dev owns it, if it has been assigned
     useEffect(() => {
         supabase
             .from('projects')
@@ -39,11 +44,10 @@ function ApplicantList() {
                     console.error('Error fetching project:', projectError);
                 } else if (projectData[0].status) {
                     setStatus(projectData[0].status);
-                    // Query the users table to find the full name of the user
                     supabase
                         .from('users')
                         .select('full_name')
-                        .eq('id', projectData[0].user_id) // Assuming 'user_id' is the field linking projects to users
+                        .eq('id', projectData[0].user_id)
                         .then(({ data: userData, error: userError }) => {
                             if (userError) {
                                 console.error('Error fetching user:', userError);
@@ -57,6 +61,8 @@ function ApplicantList() {
             });
     }, []);
 
+
+    //Gets list of devs who have applied to project
     useEffect(() => {
         supabase
             .from('applicants')
@@ -82,6 +88,8 @@ function ApplicantList() {
             });
     }, [id]);
 
+
+    //function to handle logic when an org chooses an applicant for a project
     const handleChooseApplicant = (applicant) => {
         if (window.confirm(`Are you sure you want to choose ${applicant.full_name} for this project?`)) {
             setSelectedApplicant(applicant);
@@ -99,10 +107,9 @@ function ApplicantList() {
                             spread: 70,
                             origin: { y: 0.6 }
                         });
-                        // Update the applicants table after successful project update
                         supabase
                             .from('applicants')
-                            .update({ chosen: true }) // Assuming you want to update the status
+                            .update({ chosen: true })
                             .eq('user_id', applicant.id)
                             .eq('project_id', id)
                             .then(({ data: updateData, error: updateError }) => {

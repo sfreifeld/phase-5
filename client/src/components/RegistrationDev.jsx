@@ -10,16 +10,17 @@ function RegistrationDev() {
   const [errors, setErrors] = useState({});
   const { session, user } = useSession();
 
+  //takes automatically created user data from supabase and copies to custom table
   function transferProfileDataToUserTable(userId, username, fullName) {
     supabase
       .from('profiles')
       .select('*')
-      .eq('id', userId)  // Filter to get only the newly signed up user's profile
+      .eq('id', userId)
       .then(({ data: profilesData, error: selectError }) => {
         if (selectError) {
           console.error('Error fetching profile:', selectError);
         } else if (profilesData.length > 0) {
-          const profile = profilesData[0];  // Assuming there's only one profile per user
+          const profile = profilesData[0];
           supabase
             .from('users')
             .insert([
@@ -38,22 +39,24 @@ function RegistrationDev() {
       });
   };
 
+  // Regex to check the username criteria
   const validateUsername = (username) => {
-    const regex = /^[A-Za-z0-9]{6,20}$/; // Regex to check the username criteria
+    const regex = /^[A-Za-z0-9]{6,20}$/;
     return regex.test(username);
   };
   
+  //copies form data to db
   const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent the default form submission
-    const userId = session.user.id; // Assuming the user ID is stored in session.user.id
-    const username = event.target.elements.formUsername.value; // Get username from the form
-    const fullName = event.target.elements.formFullName.value; // Get full name from the form
+    event.preventDefault();
+    const userId = session.user.id;
+    const username = event.target.elements.formUsername.value;
+    const fullName = event.target.elements.formFullName.value;
 
     setErrors({});
 
     if (!validateUsername(username)) {
       setErrors({ username: 'Username must be 6-20 characters and contain no special characters.' });
-      return; // Stop the form submission if validation fails
+      return;
     }
 
     transferProfileDataToUserTable(userId, username, fullName);
@@ -68,7 +71,7 @@ function RegistrationDev() {
         <Form.Control 
           type="text" 
           placeholder="Enter username" 
-          isInvalid={!!errors.username}  // Add this line
+          isInvalid={!!errors.username}
         />
         <Form.Control.Feedback type="invalid">
           {errors.username}

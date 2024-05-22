@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import RegistrationDev from '../components/RegistrationDev';
 import RegistrationOrg from '../components/RegistrationOrg';
-//import 'bootstrap/dist/css/bootstrap.min.css';
 import { supabase } from "../supabaseClient"
 
 

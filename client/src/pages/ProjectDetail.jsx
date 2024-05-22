@@ -1,4 +1,3 @@
-import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import NavBarMain from '../components/NavBar';
 import { useParams } from 'react-router-dom'
@@ -10,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faClock, faKeyboard   } from '@fortawesome/free-solid-svg-icons';
 
 
-
 function ProjectDetail() {
     const {session, user, userType} = useSession();
     const { id } = useParams()
@@ -18,9 +16,8 @@ function ProjectDetail() {
     const [project, setProject] = useState(undefined)
     const [org, setOrg] = useState(undefined)
 
-
+    //checks current user's application status for project
     useEffect(() => {
-        // Check if the user has already applied to the project
         const checkApplicationStatus = async () => {
             const { data, error } = await supabase
                 .from('applicants')
@@ -41,7 +38,7 @@ function ProjectDetail() {
         }
     }, [user, id]);
 
-
+    //gets org info for project
     useEffect(() => {
         const fetchProjectAndOrg = async () => {
             const { data: projectData, error: projectError } = await supabase
@@ -76,6 +73,7 @@ function ProjectDetail() {
         }
     }, [id]);
 
+    //handles a user applying for a project
     function handleUserApplication() {
         if (!isApplied) {
             supabase
@@ -89,7 +87,7 @@ function ProjectDetail() {
                         console.error('Error:', response.error.message);
                     } else {
                         console.log('Success:', response.data);
-                        setIsApplied(true); // Set isApplied to true after successful application
+                        setIsApplied(true);
                     }
                 });
         }

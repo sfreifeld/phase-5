@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
+
+//way to make session, user, and userType global variables
 const SessionContext = createContext();
 
 export const SessionProvider = ({ children }) => {

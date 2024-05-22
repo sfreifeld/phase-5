@@ -1,46 +1,50 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { supabase } from "../supabaseClient"
 import { useSession } from './SessionContext';
 
-function transferProfileDataToOrgTable(orgId, orgName, websiteUrl, sector) {
-  supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', orgId)  // Filter to get only the newly signed up org's profile
-    .then(({ data: profilesData, error: selectError }) => {
-      if (selectError) {
-        console.error('Error fetching profile:', selectError);
-      } else if (profilesData.length > 0) {
-        const profile = profilesData[0];  // Assuming there's only one profile per user
-        supabase
-          .from('organizations')
-          .insert([
-            { profile_id: profile.id, org_name: orgName, website_url: websiteUrl, sector: sector }
-          ])
-          .then(({ data: insertData, error: insertError }) => {
-            if (insertError) {
-              console.error('Error inserting data into users table:', insertError);
-            } else {
-              console.log('Data added successfully to users table:', insertData);
-            }
-          });
-      } else {
-        console.log('No profile found for the user:', orgId);
-      }
-    });
-};
+
 
 function RegistrationOrg() {
   const {session} = useSession();
 
+  //takes automatically created user data from supabase and copies to custom table
+  function transferProfileDataToOrgTable(orgId, orgName, websiteUrl, sector) {
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', orgId)
+      .then(({ data: profilesData, error: selectError }) => {
+        if (selectError) {
+          console.error('Error fetching profile:', selectError);
+        } else if (profilesData.length > 0) {
+          const profile = profilesData[0]; 
+          supabase
+            .from('organizations')
+            .insert([
+              { profile_id: profile.id, org_name: orgName, website_url: websiteUrl, sector: sector }
+            ])
+            .then(({ data: insertData, error: insertError }) => {
+              if (insertError) {
+                console.error('Error inserting data into users table:', insertError);
+              } else {
+                console.log('Data added successfully to users table:', insertData);
+              }
+            });
+        } else {
+          console.log('No profile found for the user:', orgId);
+        }
+      });
+  };
+  
 
+  //copies form data to db
   const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent the default form submission
-    const orgId = session.user.id; // Assuming the user ID is stored in session.user.id
-    const orgName= event.target.elements.formOrgName.value; // Get username from the form
-    const websiteUrl = event.target.elements.formWebsiteUrl.value; // Get full name from the form
+    event.preventDefault(); 
+    const orgId = session.user.id;
+    const orgName= event.target.elements.formOrgName.value;
+    const websiteUrl = event.target.elements.formWebsiteUrl.value;
     const sector = event.target.elements.formSector.value;
     transferProfileDataToOrgTable(orgId, orgName, websiteUrl, sector);
   };

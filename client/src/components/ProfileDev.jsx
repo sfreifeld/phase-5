@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useSession } from './SessionContext'
 import { Link } from 'react-router-dom';
+import backgroundImage from '../assets/background-dev.jpg';
 
 export default function ProfileDev() {
     
@@ -15,12 +16,13 @@ export default function ProfileDev() {
     const [isEditing, setIsEditing] = useState(false);
     const [editableBio, setEditableBio] = useState("Here is your bio.  You can write about your educational experience, your skills, and what you want to work on!");
     const [skills, setSkills] = useState([])
-    const [profilepic, setProfilePic] = useState('https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp')
+    const [profilepic, setProfilePic] = useState('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg')
     const { id } = useParams();
     const { session, user } = useSession();
     const [applications, setApplications] = useState([])
 
 
+    // handles the logic for when a person drops a file for their profile picture
     const {getRootProps, getInputProps} = useDropzone({
         onDrop: acceptedFiles => {
           const file = acceptedFiles[0];
@@ -39,7 +41,6 @@ export default function ProfileDev() {
                 console.error('Error uploading file:', error);
               } else {
                 console.log('File uploaded successfully:', data);
-                // Optimistically update the profile picture URL in state
                 const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}?${new Date().getTime()}`;
                 setProfilePic(newProfilePicUrl);
               }
@@ -48,7 +49,7 @@ export default function ProfileDev() {
       });
 
 
-
+      // deletes user application from db
       const handleDeleteApplication = (projectId, userId) => {
         if (window.confirm("Are you sure you want to withdraw your application?  This action cannot be undone.")) {
           supabase
@@ -67,7 +68,7 @@ export default function ProfileDev() {
         }
       }
     
-
+    // toggles profile to edit mode
     const handleEditClick = () => {
         if (isEditing) {
             supabase
@@ -89,7 +90,7 @@ export default function ProfileDev() {
             setIsEditing(!isEditing);
         }
                                 
-
+    //handles logic for changing profile elements while in edit mode
     const handleBioChange = (event) => {
         setEditableBio(event.target.value);
     };
@@ -104,6 +105,7 @@ export default function ProfileDev() {
         setSkills(skills.filter(s => s !== skill))
     }
 
+    //gets list of projects for that user
     useEffect(() => {
         if (session && session.user) {
             supabase
@@ -135,7 +137,7 @@ export default function ProfileDev() {
         }
     }, [session]);
 
-
+    //gets list of open aplications for the user
     useEffect(() => {
         if (user) {
             supabase
@@ -160,8 +162,7 @@ export default function ProfileDev() {
                                             console.error('Error fetching project data:', projectError);
                                         } else {
                                             console.log('Project data:', projectData);
-                                            fetchedProjects.push(...projectData); // Assuming projectData is an array
-                                            // Check if all requests have been processed
+                                            fetchedProjects.push(...projectData);
                                             if (fetchedProjects.length === array.length) {
                                                 setApplications(fetchedProjects);
                                             }
@@ -174,7 +175,7 @@ export default function ProfileDev() {
                     }
                 });
         }
-    }, [user]); // Depend on user to re-run this effect when user changes
+    }, [user]); 
 
 
     useEffect(() => {
@@ -190,20 +191,14 @@ export default function ProfileDev() {
         }
       }, [userData]);
 
-
-
-
-
-    
-
-
+      
     return (
-      <div className="vh-100 vw-100" style={{ backgroundColor: '#9de2ff' }}>
+        <div className="vh-100 vw-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <NavBarMain></NavBarMain>
         <MDBContainer>
           <MDBRow className="justify-content-left d-flex align-items-stretch">
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px', height: '100%' }}>
+              <MDBCard className="custom-card" style={{ borderRadius: '15px', height: '100%' }}>
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-shrink-0">
@@ -251,7 +246,7 @@ export default function ProfileDev() {
               </MDBCard>
             </MDBCol>
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px', height: '100%'}}>
+              <MDBCard className="custom-card" style={{ borderRadius: '15px', height: '100%'}}>
                 <MDBCardBody className="p-4">
                   <MDBRow>
                     <MDBCol md="6">
@@ -307,7 +302,7 @@ export default function ProfileDev() {
   
           <MDBRow className="justify-content-left">
             <MDBCol md="12" lg="12" xl="12" className="mt-5">
-              <MDBCard style={{ borderRadius: '15px' }}>
+              <MDBCard className="custom-card" style={{ borderRadius: '15px' }}>
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-grow-1 ms-3">

@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient"
-
-import { Container, Navbar, Nav, Form, FormControl, Button, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import heroVideo from '../assets/hero.mp4'
 
 

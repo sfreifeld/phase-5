@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient"
 import { Dropdown } from 'react-bootstrap';
 
-
+//currently has no functionality
 function SearchBar( ) {
     return (
         <div className="search container-fluid border-bottom">

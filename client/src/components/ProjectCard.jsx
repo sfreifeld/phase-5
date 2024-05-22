@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "../supabaseClient"
 import { useEffect, useState } from 'react';
-import { useSession } from './SessionContext';
 
 
 function ProjectCard({project}) {
@@ -9,22 +8,20 @@ function ProjectCard({project}) {
     const tags = project.tags
     const [org, setOrg] = useState('')
 
-
+    // gets org data for each project
     useEffect(() => {
         const fetchOrgName = async () => {
             if (!project.org_id) return;
 
             const { data, error } = await supabase
-                .from('organizations') // Replace 'organizations' with your table name
-                .select('*') // Assuming the organization's name is stored in 'name' column
-                .eq('id', project.org_id) // Assuming 'id' is the column for organization ID
-                .maybeSingle(); // Use single if you're expecting only one row to match
-
+                .from('organizations')
+                .select('*') 
+                .eq('id', project.org_id)
+                .maybeSingle();
             if (error) {
                 console.error('Error fetching organization', error);
                 return;
             }
-
             if (data) {
                 setOrg(data);
             }
@@ -33,14 +30,9 @@ function ProjectCard({project}) {
         fetchOrgName();
     }, [project.org_id, org]);
 
-
-
-
-
-
-
+    //handles navigation to project details page
     const handleDetailsClick = () => {
-        navigate(`/project/${project.id}`, { state: { project: project} }) // Navigate to /project when button is clicked
+        navigate(`/project/${project.id}`, { state: { project: project} })
     };
 
     return (

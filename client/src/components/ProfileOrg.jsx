@@ -19,7 +19,7 @@ export default function ProfileOrg() {
   const { id } = useParams();
   const { session } = useSession();
 
-
+   // handles the logic for when a person drops a file for their profile picture
   const {getRootProps, getInputProps} = useDropzone({
     onDrop: acceptedFiles => {
       const file = acceptedFiles[0];
@@ -46,7 +46,7 @@ export default function ProfileOrg() {
     }
   });
 
-
+  // toggles profile to edit mode
   const handleEditClick = () => {
     if (isEditing) {
         supabase
@@ -68,7 +68,7 @@ export default function ProfileOrg() {
         setIsEditing(!isEditing);
     }
 
-
+//handles logic for changing profile elements while in edit mode
     const handleAddTag = (tag) => {
       if (tag && !tags.includes(tag)) {
           setTags([...tags, tag])
@@ -101,7 +101,7 @@ export default function ProfileOrg() {
         });
     }
   }
-
+    //gets list of projects for that org
   useEffect(() => {
     if (session) {
         supabase

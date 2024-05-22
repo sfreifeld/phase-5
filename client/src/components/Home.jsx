@@ -3,12 +3,12 @@ import NavBarMain from "./NavBar";
 import ProjectCard from "./ProjectCard"
 import React, { useState, useEffect } from 'react';
 import SearchBar from "./SearchBar";
-import { Button } from 'react-bootstrap';
 import HomeHero from "./HomeHero";
 
 function Home( ) {
   const [projects, setProjects] = useState([]);
 
+  //gets list of projects
   useEffect(() => {
     supabase
       .from('projects')

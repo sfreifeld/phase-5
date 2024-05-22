@@ -13,9 +13,9 @@ import Registration from "./pages/Registration";
 
 import ProfileDev from "./components/ProfileDev";
 import ProfileOrg from "./components/ProfileOrg"
-import ProjectCard from "./components/ProjectCard";
 import ProjectDetail from "./pages/ProjectDetail"
 import CreateProject from "./components/CreateProject"
+import Notification from "./pages/Notification"
 
 
 
@@ -28,7 +28,7 @@ export default function App() {
   const [userType, setUserType] = useState('')
 
 
-
+//supabase handling auth
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -48,7 +48,6 @@ export default function App() {
   }, []);
 
   const checkRegistration = (userId) => {
-    // Query both users and organizations tables
     const userQuery = supabase
       .from('users')
       .select('*')
@@ -95,6 +94,7 @@ export default function App() {
             <Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev/> : <ProfileOrg/>} />
             <Route path="/project/:id" element= {<ProjectDetail />} />
             <Route path="/createproject" element= {<CreateProject />} />
+            <Route path="/notifications/:id" element= {<Notification />} />
           </Routes>
         </Router>
     );
