@@ -133,9 +133,10 @@ export default function ProfileDev() {
                         return;
                     }
                     setProjects(projectsData);
+                    console.log(4)
                 });
         }
-    }, [session]);
+    }, []);
 
     //gets list of open aplications for the user
     useEffect(() => {
@@ -165,6 +166,7 @@ export default function ProfileDev() {
                                             fetchedProjects.push(...projectData);
                                             if (fetchedProjects.length === array.length) {
                                                 setApplications(fetchedProjects);
+                                                console.log(5)
                                             }
                                         }
                                     });
@@ -175,23 +177,26 @@ export default function ProfileDev() {
                     }
                 });
         }
-    }, [user]); 
+    }, []); 
 
 
     useEffect(() => {
         if (userData) {
           if (userData.bio) {
             setEditableBio(userData.bio);
+            console.log(6)
           } else {
             setEditableBio("Here is your bio. You can write about your educational experience, your skills, and what you want to work on!");
+            console.log(7)
           }
           if (userData.skills) {
             setSkills(userData.skills)
+            console.log(8)
           }
         }
-      }, [userData]);
+      }, []);
 
-      
+
     return (
         <div className="vh-100 vw-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <NavBarMain></NavBarMain>

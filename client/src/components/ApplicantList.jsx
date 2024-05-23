@@ -10,6 +10,7 @@ function ApplicantList() {
     const [selectedApplicant, setSelectedApplicant] = useState(null);
     const [ status , setStatus] = useState('')
     const [ dev, setDev] = useState({})
+    const { userType } = useSession();
 
 
     //Helper function to change status value to correct capitalization
@@ -41,25 +42,33 @@ function ApplicantList() {
             .eq('id', id)
             .then(({ data: projectData, error: projectError }) => {
                 if (projectError) {
+                    console.log(id)
                     console.error('Error fetching project:', projectError);
                 } else if (projectData[0].status) {
                     setStatus(projectData[0].status);
-                    supabase
-                        .from('users')
-                        .select('full_name')
-                        .eq('id', projectData[0].user_id)
-                        .then(({ data: userData, error: userError }) => {
-                            if (userError) {
-                                console.error('Error fetching user:', userError);
-                            } else if (userData.length > 0) {
-                                setDev(userData[0])
-                            } else {
-                                console.log('No user found for this project');
-                            }
-                        });
+                    console.log(projectData[0])
+                    if (projectData[0].user_id) { // Check if user_id is not null
+                        supabase
+                            .from('users')
+                            .select('full_name')
+                            .eq('id', projectData[0].user_id)
+                            .then(({ data: userData, error: userError }) => {
+                                if (userError) {
+                                    console.error('Error fetching user:', userError);
+                                } else if (userData.length > 0) {
+                                    console.log(userData[0])
+                                    setDev(userData[0])
+                                } else {
+                                    console.log('No user found for this project');
+                                }
+                            });
+                    } else {
+                        console.log('No user assigned to this project yet');
+                        setDev({}); // Reset or clear the dev state
+                    }
                 }
             });
-    }, []);
+    }, [id]);
 
 
     //Gets list of devs who have applied to project
@@ -86,7 +95,7 @@ function ApplicantList() {
                         });
                 }
             });
-    }, [id]);
+    }, []);
 
 
     //function to handle logic when an org chooses an applicant for a project
@@ -133,7 +142,7 @@ function ApplicantList() {
             ) : (
                 <h3>Loading...</h3>
             )}
-            {status == 'open' && dev !== null ? (
+            {status == 'open' && Object.keys(dev).length > 0 && userType == 'org' && (
                 <>
                     <h3 className="mb-3">Are you ready to choose a developer for this project?</h3>
                     {applicants.map((applicant, index) => (
@@ -142,8 +151,9 @@ function ApplicantList() {
                         </button>
                     ))}
                 </>
-            ) : (
-                <h3 className="mb-3">Software Developer: {dev.full_name}</h3>
+            )}
+            {status == 'in progress' || status == 'closed' && (
+            <h3 className="mb-3">Software Developer: {dev.full_name}</h3>
             )}
         </div>
     );

@@ -9,37 +9,60 @@ export const SessionProvider = ({ children }) => {
     const [session, setSession] = useState(null);
     const [user, setUser] = useState(null);
     const [userType, setUserType] = useState('');
+    const [profile, setProfile] = useState(null)
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            if (session && session.user) {
-                checkRegistration(session.user.id);
-            }
+          setSession(session);
+          if (session) {
+            supabase
+            .from('profiles')
+            .select('*')
+            .eq('uuid', session.user.id)
+            .then(({ data, error }) => {
+              if (error) {
+                console.error('Error fetching profile:', error);
+              } else {
+                setProfile(data);
+                checkRegistration(data[0].id); // Also corrected to use data.id directly
+              }
+            });
+          }
         });
-
+    
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            if (session && session.user) {
-                checkRegistration(session.user.id);
-            }
+          setSession(session);
+          if (session) {
+            supabase
+            .from('profiles')
+            .select('*')
+            .eq('uuid', session.user.id)
+            .then(({ data, error }) => {
+              if (error) {
+                console.error('Error fetching profile:', error);
+              } else {
+                setProfile(data);
+                checkRegistration(data[0].id); // Also corrected to use data.id directly
+              }
+            });
+          }
         });
-
+    
         return () => subscription.unsubscribe();
-    }, []);
+      }, []); // Ensures the useEffect hook is properly closed
 
-    function checkRegistration(userId) {
+      const checkRegistration = (userId) => {
         const userQuery = supabase
-            .from('users')
-            .select('*')
-            .eq('profile_id', userId)
-            .maybeSingle();
-
+          .from('users')
+          .select('*')
+          .eq('profile_id', userId)
+          .maybeSingle();
+    
         const organizationQuery = supabase
-            .from('organizations')
-            .select('*')
-            .eq('profile_id', userId)
-            .maybeSingle();
+          .from('organizations')
+          .select('*')
+          .eq('profile_id', userId)
+          .maybeSingle();
 
         
         

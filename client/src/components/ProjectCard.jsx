@@ -28,7 +28,7 @@ function ProjectCard({project}) {
         };
 
         fetchOrgName();
-    }, [project.org_id, org]);
+    }, []);
 
     //handles navigation to project details page
     const handleDetailsClick = () => {

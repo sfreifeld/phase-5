@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -17,15 +16,19 @@ import ProjectDetail from "./pages/ProjectDetail"
 import CreateProject from "./components/CreateProject"
 import Notification from "./pages/Notification"
 
-
-
-
-
+const getProfileComponent = (userType) => {
+  if (userType === 'dev') {
+    return <ProfileDev />;
+  } else {
+    return <ProfileOrg />;
+  }
+};
 
 export default function App() {
   const [session, setSession] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [userType, setUserType] = useState('')
+  const [userType, setUserType] = useState(null)
+  const [profile, setProfile] = useState(null)
 
 
 //supabase handling auth
@@ -33,19 +36,41 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
-        checkRegistration(session.user.id);
+        supabase
+        .from('profiles')
+        .select('*')
+        .eq('uuid', session.user.id)
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error fetching profile:', error);
+          } else {
+            setProfile(data);
+            checkRegistration(data[0].id); // Also corrected to use data.id directly
+          }
+        });
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        checkRegistration(session.user.id);
+        supabase
+        .from('profiles')
+        .select('*')
+        .eq('uuid', session.user.id)
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error fetching profile:', error);
+          } else {
+            setProfile(data);
+            checkRegistration(data[0].id); // Also corrected to use data.id directly
+          }
+        });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, []); // Ensures the useEffect hook is properly closed
 
   const checkRegistration = (userId) => {
     const userQuery = supabase
@@ -87,11 +112,15 @@ export default function App() {
       </div>
     );
   } else {
+    if (!userType) {
+      return <div>Loading user type...</div>; // Show loading until userType is determined
+    }
+
     return (
         <Router>
           <Routes>
             <Route path="/" element={isRegistered ? <Home/> : <Registration />} />
-            <Route path="/profile/:id" element={userType === 'dev' ? <ProfileDev/> : <ProfileOrg/>} />
+            <Route path="/profile/:id" element={getProfileComponent(userType)} />
             <Route path="/project/:id" element= {<ProjectDetail />} />
             <Route path="/createproject" element= {<CreateProject />} />
             <Route path="/notifications/:id" element= {<Notification />} />

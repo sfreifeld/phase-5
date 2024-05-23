@@ -19,6 +19,8 @@ export default function ProfileOrg() {
   const { id } = useParams();
   const { session } = useSession();
 
+  console.log('hello')
+
    // handles the logic for when a person drops a file for their profile picture
   const {getRootProps, getInputProps} = useDropzone({
     onDrop: acceptedFiles => {
@@ -66,6 +68,7 @@ export default function ProfileOrg() {
             })
         }
         setIsEditing(!isEditing);
+        console.log(9)
     }
 
 //handles logic for changing profile elements while in edit mode
@@ -128,9 +131,10 @@ export default function ProfileOrg() {
                     return;
                 }
                 setProjects(projectsData);
+                console.log(10)
             });
     }
-}, [session]);
+}, [session]); // Ensure dependencies are correct
 
 
 
@@ -140,12 +144,14 @@ export default function ProfileOrg() {
         setEditableDescription(orgData.description);
       } else {
         setEditableDescription("This is your nonprofit description. You can write about what your organization does, your mission statement, and what kind of work you're looking for!");
+        console.log(11)
       }
       if (orgData.tags) {
         setTags(orgData.tags)
+        console.log(12)
       }
     }
-  }, [orgData]);
+  }, []);
 
 
 
@@ -295,6 +301,7 @@ export default function ProfileOrg() {
       </div>
     );
   }
+  
   
   
   

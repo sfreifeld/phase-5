@@ -13,6 +13,7 @@ function ProjectDetail() {
     const {session, user, userType} = useSession();
     const { id } = useParams()
     const [isApplied, setIsApplied] = useState(false);
+    const [applicationSuccess, setApplicationSuccess] = useState(false); // New state to track successful application
     const [project, setProject] = useState(undefined)
     const [org, setOrg] = useState(undefined)
 
@@ -36,7 +37,7 @@ function ProjectDetail() {
         if (user && id) {
             checkApplicationStatus();
         }
-    }, [user, id]);
+    }, []);
 
     //gets org info for project
     useEffect(() => {
@@ -71,7 +72,7 @@ function ProjectDetail() {
         if (id) {
             fetchProjectAndOrg();
         }
-    }, [id]);
+    }, [id]); // Include `id` in the dependency array
 
     //handles a user applying for a project
     function handleUserApplication() {
@@ -88,6 +89,7 @@ function ProjectDetail() {
                     } else {
                         console.log('Success:', response.data);
                         setIsApplied(true);
+                        setApplicationSuccess(true); // Set success message to be true
                     }
                 });
         }
@@ -112,7 +114,12 @@ function ProjectDetail() {
                             <p className='mb-4'><FontAwesomeIcon icon={faCalendarDays} style={{color: "#6495ed",}} className="me-2"/>Posted on {new Date(project.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                             <p className='mb-4'><FontAwesomeIcon icon={faClock} style={{color: "#6495ed",}} className="me-2" />{project.project_length}</p>
                             <p className='mb-4'><FontAwesomeIcon icon={faKeyboard} style={{color: "#6495ed",}} className="me-2"/>{org.website_url}</p>
-                            {userType == 'dev' ? (<button className='btn' onClick={handleUserApplication} disabled={isApplied}> Apply</button>) : ('')}
+                            {userType == 'dev' ? (
+                                <>
+                                    <button className='btn' onClick={handleUserApplication} disabled={isApplied}>Apply</button>
+                                    {applicationSuccess && <p style={{ color: 'green' }}>You have applied successfully!</p>} {/* Conditional rendering of success message */}
+                                </>
+                            ) : ('')}
                         </div>
                     </div>
                     <br></br>
