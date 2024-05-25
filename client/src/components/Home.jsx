@@ -9,11 +9,13 @@ function Home( ) {
   const [projects, setProjects] = useState([]); // Original fetched projects
   const [displayedProjects, setDisplayedProjects] = useState([]); // Projects to display (sorted)
   const [sortType, setSortType] = useState('')
+  const [filterType, setFilterType] = useState('')
   const lengthSortOrder = {
     '1-3 Weeks': 1,
     '4-6 Weeks': 2,
     '7+ Weeks': 3
   };
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch projects
   useEffect(() => {
@@ -32,22 +34,36 @@ function Home( ) {
 
   // Sort and filter projects
   useEffect(() => {
+    let filteredProjects = projects;
+    if (searchQuery) {
+      filteredProjects = filteredProjects.filter(project =>
+        project.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+
+    if (filterType == 'open') {
+      filteredProjects = filteredProjects.filter(project => project.status == 'open')
+    }  else if (filterType == 'inProgress') {
+      filteredProjects = filteredProjects.filter(project => project.status == 'in progress')
+    }  else if (filterType == 'closed') {
+      filteredProjects = filteredProjects.filter(project => project.status == 'closed')
+    }
 
     // Apply sort
     if (sortType === 'Posted Date') {
-      projects.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      filteredProjects.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     } else if (sortType === 'Project Length') {
-      projects.sort((a, b) => lengthSortOrder[a.project_length] - lengthSortOrder[b.project_length]);
+      filteredProjects.sort((a, b) => lengthSortOrder[a.project_length] - lengthSortOrder[b.project_length]);
     }
 
-    setDisplayedProjects(projects);
-  }, [sortType, projects]);
+    setDisplayedProjects(filteredProjects);
+  }, [sortType, searchQuery, projects, filterType]);
 
   return (
     <div className="min-vh-100 vw-100 background">
         <NavBarMain className="fixed-top"></NavBarMain>
         <HomeHero className=""></HomeHero>
-        <SearchBar setSortType={setSortType} className=""/>
+        <SearchBar setSortType={setSortType} setSearchQuery={setSearchQuery} setFilterType={setFilterType}className=""/>
         {displayedProjects.map(project => (
         <ProjectCard key={project.id} project={project}/>
       ))}

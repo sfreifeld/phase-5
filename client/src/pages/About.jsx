@@ -3,7 +3,6 @@ import NavBarMain from '../components/NavBar';
 
 
 function About() {
-    const navigate = useNavigate(); 
 
   return (
     <div className="min-vh-100 vw-100 background">

@@ -380,10 +380,11 @@ export default function ProfileDev() {
                             <MDBCardText dangerouslySetInnerHTML={{ __html: editableBio.replace(/\n/g, '<br />') }}></MDBCardText>
                         )}
                       <MDBCardTitle className = "mt-4"> Resume </MDBCardTitle>
-                      {resumeExists ? (
+                      {resumeExists && !isEditing && (
                         <a href={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/resumes/resumes/${user.id}/1`} download="Resume.pdf" target='_blank'>Download Resume</a>
-                      ) : (
-                        <div>No resume</div>
+                      )}
+                      {!resumeExists && !isEditing && (
+                        <p>No resume on file</p>
                       )}
                       { isEditing ? (
                       <input type="file" onChange={(e) => handleResumeUpload(e.target.files[0])} />
@@ -401,10 +402,13 @@ export default function ProfileDev() {
                         {isEditing && (
                             <div>
                                 <input type="text" placeholder="Add skill" onKeyDown={e => {
-                                    if (e.key === 'Enter') {
+                                    if (e.key === 'Enter' && skills.length < 8) {
                                         e.preventDefault(); // Prevents the default form submission behavior
                                         handleAddSkill(e.target.value);
                                         e.target.value = ''; // Optionally clear the input after adding
+                                    }
+                                    else if (e.key === 'Enter' && skills.length >= 8) {
+                                        alert("Please only add up to 8 skills");
                                     }
                                 }} />
                             </div>
