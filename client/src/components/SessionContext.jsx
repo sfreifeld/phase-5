@@ -9,7 +9,8 @@ export const SessionProvider = ({ children }) => {
     const [session, setSession] = useState(null);
     const [user, setUser] = useState(null);
     const [userType, setUserType] = useState('');
-    const [profile, setProfile] = useState(null)
+    const [profile, setProfile] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);  // Added loading state
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -72,9 +73,6 @@ export const SessionProvider = ({ children }) => {
             if (userResult.data) {
                 setUser(userResult.data); // Set user to the user record
                 setUserType('dev');
-            //if (userResult.data) {
-            //    setUser(userResult.data); // Set user to the user record
-             //   setUserType('dev');
             } else if (organizationResult.data) {
                 setUser(organizationResult.data); // Set user to the organization record
                 setUserType('org');
@@ -82,11 +80,12 @@ export const SessionProvider = ({ children }) => {
                 setUser(null); // No user or organization found
                 setUserType('');
             }
+            setIsLoading(false);  // Set loading to false after determining user type
         });
     }
 
     return (
-        <SessionContext.Provider value={{ session, user, userType }}>
+        <SessionContext.Provider value={{ session, user, userType, isLoading }}>
             {children}
         </SessionContext.Provider>
     );

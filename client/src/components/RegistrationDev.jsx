@@ -15,7 +15,7 @@ function RegistrationDev() {
     supabase
       .from('profiles')
       .select('*')
-      .eq('id', userId)
+      .eq('uuid', userId)
       .then(({ data: profilesData, error: selectError }) => {
         if (selectError) {
           console.error('Error fetching profile:', selectError);

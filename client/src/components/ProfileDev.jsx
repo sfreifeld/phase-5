@@ -11,28 +11,58 @@ import backgroundImage from '../assets/background-dev.jpg';
 
 export default function ProfileDev() {
     
-    const [userData, setUserData] = useState(null)
     const [projects, setProjects] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [editableBio, setEditableBio] = useState("Here is your bio.  You can write about your educational experience, your skills, and what you want to work on!");
     const [skills, setSkills] = useState([])
-    const [profilepic, setProfilePic] = useState('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg')
+    const [profileImageUrl, setProfileImageUrl] = useState('');
     const { id } = useParams();
     const { session, user } = useSession();
     const [applications, setApplications] = useState([])
+    const [loading, setLoading] = useState(true); // Loading state
+    const [resumeExists, setResumeExists] = useState(false);
 
+    useEffect(() => {
+        const imageUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}`;
+        fetch(imageUrl)
+            .then(response => {
+                if (response.ok) {
+                    setProfileImageUrl(imageUrl);
+                } else {
+                    setProfileImageUrl('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg'); // Default image URL
+                }
+            })
+            .catch(() => {
+                setProfileImageUrl('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg'); // Default image URL on error
+            });
+    }, [user.profile_id]); // Dependency array to re-run this effect when user.profile_id changes
+
+    useEffect(() => {
+        if (user) {
+            setLoading(false);
+        } else {
+            setLoading(true);
+        }
+    }, [user]); // Dependency on user object from session context
 
     // handles the logic for when a person drops a file for their profile picture
     const {getRootProps, getInputProps} = useDropzone({
         onDrop: acceptedFiles => {
           const file = acceptedFiles[0];
+
+          // Check if the file type starts with 'image/'
+          if (!file.type.startsWith('image/')) {
+            alert('Profile pictures must be either a .jpeg, .png, or .gif');
+            return; // Stop the function if the file is not an image
+          }
+
           const formData = new FormData();
           formData.append('file', file);
     
           supabase
             .storage
             .from('avatars')
-            .upload(`${session.user.id}`, file, {
+            .upload(`${user.profile_id}`, file, {
               cacheControl: '3600',
               upsert: true
             })
@@ -41,16 +71,58 @@ export default function ProfileDev() {
                 console.error('Error uploading file:', error);
               } else {
                 console.log('File uploaded successfully:', data);
-                const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}?${new Date().getTime()}`;
-                setProfilePic(newProfilePicUrl);
+                const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}?${new Date().getTime()}`;
+                setProfileImageUrl(newProfilePicUrl);
               }
             });
-        }
+        },
+        accept: 'image/*' // This line ensures only image files are accepted
       });
 
 
-      // deletes user application from db
-      const handleDeleteApplication = (projectId, userId) => {
+      const handleResumeUpload = async (file) => {
+        const filePath = `resumes/${user.id}/1`;
+        const { data, error } = await supabase
+            .storage
+            .from('resumes')
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: true
+            });
+    
+        if (error) {
+            console.error('Error uploading resume:', error);
+            return;
+        }
+    
+    
+        console.log('Resume uploaded successfully:', data);
+    };
+
+    const checkResumeExists = async () => {
+        const filePath = `resumes/${user.id}/1`;
+        const { data, error } = await supabase
+            .storage
+            .from('resumes')
+            .getPublicUrl(filePath);
+
+        if (error) {
+            console.error('Error checking resume:', error);
+            setResumeExists(false);
+        } else {
+            // Check if the URL is valid and not just a default or error URL
+            setResumeExists(data.publicURL !== null);
+        }
+    };
+
+    useEffect(() => {
+        if (user && user.id) {
+            checkResumeExists();
+        }
+    }, [user]);
+
+    // deletes user application from db
+    const handleDeleteApplication = (projectId, userId) => {
         if (window.confirm("Are you sure you want to withdraw your application?  This action cannot be undone.")) {
           supabase
             .from('applicants')
@@ -77,7 +149,7 @@ export default function ProfileDev() {
                      bio: editableBio,
                      skills: skills 
                     })
-                .eq('profile_id', session.user.id)
+                .eq('id', user.id)
                 .single()
                 .then(({ data: updateData, error: updateError }) => {
                     if (updateError) {
@@ -97,7 +169,11 @@ export default function ProfileDev() {
 
     const handleAddSkill = (skill) => {
         if (skill && !skills.includes(skill)) {
-            setSkills([...skills, skill])
+            if (skills.length < 8) {
+                setSkills([...skills, skill]);
+            } else {
+                alert('You can only add up to 8 skills.');
+            }
         }
     }
 
@@ -107,36 +183,20 @@ export default function ProfileDev() {
 
     //gets list of projects for that user
     useEffect(() => {
-        if (session && session.user) {
+        if (user) {
             supabase
-                .from('users')
+                .from('projects')
                 .select('*')
-                .eq('profile_id', session.user.id)
-                .maybeSingle()
-                .then(({ data: userData, error: userError }) => {
-                    if (userError) {
-                        console.error('Error fetching user data:', userError);
-                        return;
-                    }
-
-                    setUserData(userData);
-                    if (userData) {
-                        return supabase
-                            .from('projects')
-                            .select('*')
-                            .eq('user_id', userData.id);
-                    }
-                })
+                .eq('user_id', user.id)
                 .then(({ data: projectsData, error: projectsError }) => {
                     if (projectsError) {
                         console.error('Error fetching projects data:', projectsError);
                         return;
                     }
                     setProjects(projectsData);
-                    console.log(4)
                 });
         }
-    }, []);
+    }, [user]);
 
     //gets list of open aplications for the user
     useEffect(() => {
@@ -166,7 +226,6 @@ export default function ProfileDev() {
                                             fetchedProjects.push(...projectData);
                                             if (fetchedProjects.length === array.length) {
                                                 setApplications(fetchedProjects);
-                                                console.log(5)
                                             }
                                         }
                                     });
@@ -177,25 +236,26 @@ export default function ProfileDev() {
                     }
                 });
         }
-    }, []); 
+    }, [user]); 
 
 
     useEffect(() => {
-        if (userData) {
-          if (userData.bio) {
-            setEditableBio(userData.bio);
-            console.log(6)
+        if (user) {
+          if (user.bio) {
+            setEditableBio(user.bio);
           } else {
             setEditableBio("Here is your bio. You can write about your educational experience, your skills, and what you want to work on!");
-            console.log(7)
           }
-          if (userData.skills) {
-            setSkills(userData.skills)
-            console.log(8)
+          if (user.skills) {
+            setSkills(user.skills)
           }
         }
-      }, []);
+      }, [user]);
 
+
+    if (loading) {
+        return <div>Loading...</div>; // Display loading message or spinner
+    }
 
     return (
         <div className="vh-100 vw-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
@@ -209,23 +269,21 @@ export default function ProfileDev() {
                     <div className="flex-shrink-0">
                     {isEditing ? (
                         <div {...getRootProps()} style={{ border: '2px dashed #007bff', padding: '20px', cursor: 'pointer', width: '180px'}}>
-                        <input {...getInputProps()} />
+                        <input {...getInputProps({ accept: 'image/*' })} />
                         <p className='fst-italic' >Drag 'n' drop a profile image here, or click to select a file</p>
                         </div>
                     ) : (
                       <MDBCardImage
                         style={{ width: '180px', borderRadius: '10px' }}
-                        src={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}`}
-                        alt='Generic placeholder image'
+                        src={profileImageUrl}
+                        alt='Profile image'
                         fluid /> )}
                     </div>
                     <div className="flex-grow-1 ms-3">
-                    { userData && (
-                        <>
-                      <MDBCardTitle>{userData.full_name}</MDBCardTitle>
-                      <MDBCardText>{userData.username}</MDBCardText>
-                      </>
-                    )}
+
+                      <MDBCardTitle>{user.full_name}</MDBCardTitle>
+                      <MDBCardText>{user.username}</MDBCardText>
+
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2"
                         style={{ backgroundColor: '#efefef' }}>
                         <div>
@@ -257,8 +315,8 @@ export default function ProfileDev() {
                     <MDBCol md="6">
                       <MDBCardTitle>Previous Projects</MDBCardTitle>
                       <ul>
-                        {projects && projects.length > 0 ? (
-                            projects.filter(project => project.status !== 'open').map(project => (
+                        {projects && projects.filter(project => project.status == 'closed') > 0 ? (
+                            projects.filter(project => project.status == 'closed').map(project => (
                               <li key={project.id}>
                                 <Link to={`/project/${project.id}`}>{project.title}</Link>
                             </li>
@@ -295,7 +353,7 @@ export default function ProfileDev() {
                               </li>
                             ))
                         ) : (
-                            <div>No current projects!</div>
+                            <div>No current applications!</div>
                         )}
                         </ul>
                     </MDBCol>
@@ -311,7 +369,7 @@ export default function ProfileDev() {
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-grow-1 ms-3">
-                    {session.user.id === id ? (
+                    {user.profile_id == id ? (
                       <MDBCardTitle>Bio <i className={`bi ${isEditing ? 'bi-check-lg' : 'bi-pencil'}`} onClick={handleEditClick}></i></MDBCardTitle>
                     ) : <MDBCardTitle>Bio</MDBCardTitle>}
                       { isEditing ? (
@@ -321,11 +379,21 @@ export default function ProfileDev() {
                         ) : (
                             <MDBCardText dangerouslySetInnerHTML={{ __html: editableBio.replace(/\n/g, '<br />') }}></MDBCardText>
                         )}
+                      <MDBCardTitle className = "mt-4"> Resume </MDBCardTitle>
+                      {resumeExists ? (
+                        <a href={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/resumes/resumes/${user.id}/1`} download="Resume.pdf" target='_blank'>Download Resume</a>
+                      ) : (
+                        <div>No resume</div>
+                      )}
+                      { isEditing ? (
+                      <input type="file" onChange={(e) => handleResumeUpload(e.target.files[0])} />
+                      ) : null}
                       <MDBCardTitle className = "mt-4"> Skills </MDBCardTitle>
+                      {isEditing && (<p className="fw-light fst-italic">8 max</p>)}
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2">
                         {skills.map(skill => (
                           <div key={skill} className="me-2">
-                            <p className="mb-0 bg-primary rounded-pill p-2">{skill}
+                            <p className="mb-0 btn" style={{ minWidth: '100px', textAlign: 'center' }}>{skill}
                               {isEditing && <i className="bi bi-x-circle m-1" onClick={() => handleRemoveSkill(skill)}></i>}
                             </p>
                           </div>
@@ -353,3 +421,4 @@ export default function ProfileDev() {
     );
   }
   
+

@@ -1,8 +1,12 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import heroVideo from '../assets/hero.mp4'
+import { useNavigate } from 'react-router-dom';
 
 
 function HomeHero() {
+    const handleLearnMoreClick = () => {
+        navigate('/about'); // Navigate to the about page
+    };
 
     return (
         <Container fluid style={{ position: 'relative', overflow: 'hidden', padding: 0, maxWidth: '100vw', minHeight: '40vh', marginTop: '-1px'}}>
@@ -28,7 +32,7 @@ function HomeHero() {
                 <Col xs={12} md={8} lg={6} className="text-center">
                     <h1 className="display-4">Phase 5 Project</h1>
                     <p className="lead">Browse projects proposed by nonprofits to gain experience and code for a cause!</p>
-                    <button className="btn">Learn More</button>
+                    <button className="btn" onClick={handleLearnMoreClick}>Learn More</button>
                 </Col>
             </Row>
         </Container>

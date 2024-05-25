@@ -72,6 +72,21 @@ html, body {
 
  }
 
+ .in-progress {
+   border: 2px solid #d4e2fb; // Added 'solid' and '2px' to specify the style and width of the border
+
+}
+
+.closed {
+   border: 2px solid #f7c9bfb9; // Added 'solid' and '2px' to specify the style and width of the border
+
+}
+
+.open {
+   border: 2px solid #d5fbd4; // Added 'solid' and '2px' to specify the style and width of the border
+
+}
+
 
  .card-title {
     font-weight: 600;

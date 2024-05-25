@@ -27,6 +27,7 @@ function NavBarMain() {
                 (<Nav.Link href="/createproject" className='text-white'>Create Project +</Nav.Link>) :
                 (<Nav.Link href={`/notifications/${user.profile_id}`} className='text-white'>Notifications</Nav.Link>)
                 }
+                <Nav.Link href="/about">About</Nav.Link>
             </Nav>
             <Button variant="outline-light" onClick={() => supabase.auth.signOut()}>Sign out</Button>
             </Container>

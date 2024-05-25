@@ -11,17 +11,18 @@ import backgroundImage from '../assets/background-org.jpg';
 
 export default function ProfileOrg() {
 
-  const [orgData, setOrgData] = useState(null)
   const [projects, setProjects] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editableDescription, setEditableDescription] = useState("This is your nonprofit summary.  Here you can write what your organization does, your mission statement, what kind of work you're looking for, and anything else!");
   const [tags, setTags] = useState([])
   const { id } = useParams();
-  const { session } = useSession();
+  const { session, user } = useSession();
 
-  console.log('hello')
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
-   // handles the logic for when a person drops a file for their profile picture
+  // handles the logic for when a person drops a file for their profile picture
   const {getRootProps, getInputProps} = useDropzone({
     onDrop: acceptedFiles => {
       const file = acceptedFiles[0];
@@ -31,7 +32,7 @@ export default function ProfileOrg() {
       supabase
         .storage
         .from('avatars')
-        .upload(`${session.user.id}`, file, {
+        .upload(`${user.profile_id}`, file, {
           cacheControl: '3600',
           upsert: true
         })
@@ -41,7 +42,7 @@ export default function ProfileOrg() {
           } else {
             console.log('File uploaded successfully:', data);
             // Optimistically update the profile picture URL in state
-            const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}?${new Date().getTime()}`;
+            const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}?${new Date().getTime()}`;
             setProfilePic(newProfilePicUrl);
           }
         });
@@ -57,7 +58,7 @@ export default function ProfileOrg() {
                description: editableDescription,
                tags: tags 
               })
-            .eq('profile_id', session.user.id)
+            .eq('id', user.id)
             .single()
             .then(({ data: updateData, error: updateError }) => {
                 if (updateError) {
@@ -68,7 +69,6 @@ export default function ProfileOrg() {
             })
         }
         setIsEditing(!isEditing);
-        console.log(9)
     }
 
 //handles logic for changing profile elements while in edit mode
@@ -106,52 +106,35 @@ export default function ProfileOrg() {
   }
     //gets list of projects for that org
   useEffect(() => {
-    if (session) {
-        supabase
-            .from('organizations')
-            .select('*')
-            .eq('profile_id', session.user.id)
-            .maybeSingle()
-            .then(({ data: orgData, error: orgError }) => {
-                if (orgError) {
-                    console.error('Error fetching organization data:', orgError);
-                    return;
-                }
-                setOrgData(orgData);
-                if (orgData) {
-                    return supabase
-                        .from('projects')
-                        .select('*')
-                        .eq('org_id', orgData.id);
-                }
-            })
-            .then(({ data: projectsData, error: projectsError }) => {
-                if (projectsError) {
-                    console.error('Error fetching projects data:', projectsError);
-                    return;
-                }
-                setProjects(projectsData);
-                console.log(10)
-            });
+    if (user) {
+      supabase
+        .from('projects')
+        .select('*')
+        .eq('org_id', user.id)
+        .then(({ data: projectsData, error: projectsError }) => {
+          if (projectsError) {
+            console.error('Error fetching projects data:', projectsError);
+            return;
+          }
+          setProjects(projectsData);
+        });
     }
-}, [session]); // Ensure dependencies are correct
+  }, [user]); 
 
 
 
   useEffect(() => {
-    if (orgData) {
-      if (orgData.description) {
-        setEditableDescription(orgData.description);
+    if (user) {
+      if (user.description) {
+        setEditableDescription(user.description);
       } else {
         setEditableDescription("This is your nonprofit description. You can write about what your organization does, your mission statement, and what kind of work you're looking for!");
-        console.log(11)
       }
-      if (orgData.tags) {
-        setTags(orgData.tags)
-        console.log(12)
+      if (user.tags) {
+        setTags(user.tags)
       }
     }
-  }, []);
+  }, [user]);
 
 
 
@@ -178,17 +161,13 @@ export default function ProfileOrg() {
                     ) : (
                       <MDBCardImage
                         style={{ width: '180px', borderRadius: '10px' }}
-                        src={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${session.user.id}`}
+                        src={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}`}
                         alt='Generic placeholder image'
                         fluid /> )}
                     </div>
                     <div className="flex-grow-1 ms-3">
-                      { orgData && (
-                      <>
-                        <MDBCardTitle>{orgData.org_name}</MDBCardTitle>
-                        <MDBCardText><a href={orgData.website_url}>{orgData.website_url}</a></MDBCardText>
-                      </>
-                        )}
+                        <MDBCardTitle>{user.org_name}</MDBCardTitle>
+                        <MDBCardText><a href={user.website_url}>{user.website_url}</a></MDBCardText>
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2"
                         style={{ backgroundColor: '#efefef' }}>
                         <div>
@@ -260,7 +239,7 @@ export default function ProfileOrg() {
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-grow-1 ms-3">
-                    {session.user.id === id ? (
+                    {user.id == id ? (
                     <MDBCardTitle>Organization Description <i className={`bi ${isEditing ? 'bi-check-lg' : 'bi-pencil'}`} onClick={handleEditClick}></i></MDBCardTitle>
                     ) : (<MDBCardTitle>Organization Description</MDBCardTitle>)}
                       { isEditing ? (
@@ -301,6 +280,8 @@ export default function ProfileOrg() {
       </div>
     );
   }
+  
+  
   
   
   

@@ -15,6 +15,9 @@ import ProfileOrg from "./components/ProfileOrg"
 import ProjectDetail from "./pages/ProjectDetail"
 import CreateProject from "./components/CreateProject"
 import Notification from "./pages/Notification"
+import About from "./pages/About"
+
+import { useSession } from './components/SessionContext'; // Import useSession
 
 const getProfileComponent = (userType) => {
   if (userType === 'dev') {
@@ -25,79 +28,7 @@ const getProfileComponent = (userType) => {
 };
 
 export default function App() {
-  const [session, setSession] = useState(null);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [userType, setUserType] = useState(null)
-  const [profile, setProfile] = useState(null)
-
-
-//supabase handling auth
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
-        supabase
-        .from('profiles')
-        .select('*')
-        .eq('uuid', session.user.id)
-        .then(({ data, error }) => {
-          if (error) {
-            console.error('Error fetching profile:', error);
-          } else {
-            setProfile(data);
-            checkRegistration(data[0].id); // Also corrected to use data.id directly
-          }
-        });
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) {
-        supabase
-        .from('profiles')
-        .select('*')
-        .eq('uuid', session.user.id)
-        .then(({ data, error }) => {
-          if (error) {
-            console.error('Error fetching profile:', error);
-          } else {
-            setProfile(data);
-            checkRegistration(data[0].id); // Also corrected to use data.id directly
-          }
-        });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []); // Ensures the useEffect hook is properly closed
-
-  const checkRegistration = (userId) => {
-    const userQuery = supabase
-      .from('users')
-      .select('*')
-      .eq('profile_id', userId)
-      .maybeSingle();
-
-    const organizationQuery = supabase
-      .from('organizations')
-      .select('*')
-      .eq('profile_id', userId)
-      .maybeSingle();
-
-    Promise.all([userQuery, organizationQuery]).then(results => {
-      const [userResult, organizationResult] = results;
-      const userExists = !userResult.error && userResult.data !== null;
-      const organizationExists = !organizationResult.error && organizationResult.data !== null;
-      setIsRegistered(userExists || organizationExists);
-      if (userExists) {
-        setUserType('dev')
-      }
-      else if (organizationExists) {
-        setUserType('org')
-      }
-    });
-  };
+  const { session, userType, isLoading } = useSession(); // Use the useSession hook
 
   if (!session) {
     return (
@@ -111,21 +42,21 @@ export default function App() {
         </div>
       </div>
     );
-  } else {
-    if (!userType) {
-      return <div>Loading user type...</div>; // Show loading until userType is determined
-    }
-
-    return (
-        <Router>
-          <Routes>
-            <Route path="/" element={isRegistered ? <Home/> : <Registration />} />
-            <Route path="/profile/:id" element={getProfileComponent(userType)} />
-            <Route path="/project/:id" element= {<ProjectDetail />} />
-            <Route path="/createproject" element= {<CreateProject />} />
-            <Route path="/notifications/:id" element= {<Notification />} />
-          </Routes>
-        </Router>
-    );
+  } else if (isLoading) { // Check isLoading instead of !userType
+    return <div>Loading...</div>; // Unified loading message
   }
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={userType ? <Home/> : <Registration />} />
+        <Route path="/profile/:id" element={getProfileComponent(userType)} />
+        <Route path="/project/:id" element= {<ProjectDetail />} />
+        <Route path="/createproject" element= {<CreateProject />} />
+        <Route path="/notifications/:id" element= {<Notification />} />
+        <Route path="/about" element= {<About/>} />
+      </Routes>
+    </Router>
+  );
 }
+

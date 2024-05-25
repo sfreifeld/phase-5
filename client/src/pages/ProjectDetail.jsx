@@ -114,7 +114,7 @@ function ProjectDetail() {
                             <p className='mb-4'><FontAwesomeIcon icon={faCalendarDays} style={{color: "#6495ed",}} className="me-2"/>Posted on {new Date(project.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                             <p className='mb-4'><FontAwesomeIcon icon={faClock} style={{color: "#6495ed",}} className="me-2" />{project.project_length}</p>
                             <p className='mb-4'><FontAwesomeIcon icon={faKeyboard} style={{color: "#6495ed",}} className="me-2"/>{org.website_url}</p>
-                            {userType == 'dev' ? (
+                            {userType == 'dev' && project.status == "open" ? (
                                 <>
                                     <button className='btn' onClick={handleUserApplication} disabled={isApplied}>Apply</button>
                                     {applicationSuccess && <p style={{ color: 'green' }}>You have applied successfully!</p>} {/* Conditional rendering of success message */}

@@ -142,7 +142,7 @@ function ApplicantList() {
             ) : (
                 <h3>Loading...</h3>
             )}
-            {status == 'open' && Object.keys(dev).length > 0 && userType == 'org' && (
+            {status == 'open' && Object.keys(applicants).length > 0 && userType == 'org' && (
                 <>
                     <h3 className="mb-3">Are you ready to choose a developer for this project?</h3>
                     {applicants.map((applicant, index) => (
@@ -152,7 +152,7 @@ function ApplicantList() {
                     ))}
                 </>
             )}
-            {status == 'in progress' || status == 'closed' && (
+            {(status == 'in progress' || status == 'closed') && (
             <h3 className="mb-3">Software Developer: {dev.full_name}</h3>
             )}
         </div>
