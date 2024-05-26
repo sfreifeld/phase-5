@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 function HomeHero() {
+    const navigate = useNavigate();
     const handleLearnMoreClick = () => {
         navigate('/about'); // Navigate to the about page
     };

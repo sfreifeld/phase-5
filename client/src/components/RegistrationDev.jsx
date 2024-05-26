@@ -3,13 +3,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { supabase } from "../supabaseClient"
 import { useSession } from './SessionContext';
+import { useNavigate } from 'react-router-dom';
 
 
 
 function RegistrationDev() {
   const [errors, setErrors] = useState({});
   const { session, user } = useSession();
-
+  const navigate = useNavigate();
   //takes automatically created user data from supabase and copies to custom table
   function transferProfileDataToUserTable(userId, username, fullName) {
     supabase
@@ -31,6 +32,7 @@ function RegistrationDev() {
                 console.error('Error inserting data into users table:', insertError);
               } else {
                 console.log('Data added successfully to users table:', insertData);
+                navigate('/'); // Navigate to home after successful insertion
               }
             });
         } else {
@@ -44,6 +46,12 @@ function RegistrationDev() {
     const regex = /^[A-Za-z0-9]{6,20}$/;
     return regex.test(username);
   };
+
+  // Regex to check the full name criteria
+  const validateFullName = (fullName) => {
+    const regex = /^[A-Za-z\s]+$/;
+    return regex.test(fullName);
+  };
   
   //copies form data to db
   const handleSubmit = (event) => {
@@ -56,6 +64,11 @@ function RegistrationDev() {
 
     if (!validateUsername(username)) {
       setErrors({ username: 'Username must be 6-20 characters and contain no special characters.' });
+      return;
+    }
+
+    if (!validateFullName(fullName)) {
+      setErrors({ fullName: 'Full name must only contain letters and spaces.' });
       return;
     }
 
@@ -79,7 +92,14 @@ function RegistrationDev() {
       </Form.Group>
       <Form.Group className="mb-3" controlId="formFullName">
         <Form.Label>Full Name</Form.Label>
-        <Form.Control type="text" placeholder="Enter full name" />
+        <Form.Control 
+          type="text" 
+          placeholder="Enter full name" 
+          isInvalid={!!errors.fullName}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errors.fullName}
+        </Form.Control.Feedback>
       </Form.Group>
       <Button variant="primary" type="submit">
         Submit

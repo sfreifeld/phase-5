@@ -104,19 +104,18 @@ export default function ProfileDev() {
         const { data, error } = await supabase
             .storage
             .from('resumes')
-            .getPublicUrl(filePath);
+            .list('', { limit: 1, prefix: filePath });
 
-        if (error) {
-            console.error('Error checking resume:', error);
+        if (data[0].id == null) {
             setResumeExists(false);
         } else {
-            // Check if the URL is valid and not just a default or error URL
-            setResumeExists(data.publicURL !== null);
+            // Check if any file is actually returned in the list
+            setResumeExists(data.length > 0);
         }
     };
 
     useEffect(() => {
-        if (user && user.id) {
+        if (user) {
             checkResumeExists();
         }
     }, [user]);
@@ -164,7 +163,12 @@ export default function ProfileDev() {
                                 
     //handles logic for changing profile elements while in edit mode
     const handleBioChange = (event) => {
-        setEditableBio(event.target.value);
+        const newBio = event.target.value;
+        if (newBio.length <= 500) {
+            setEditableBio(newBio);
+        } else {
+            alert('Bio must be less than 500 characters.');
+        }
     };
 
     const handleAddSkill = (skill) => {
@@ -330,7 +334,7 @@ export default function ProfileDev() {
                       <MDBCardTitle>Current Projects</MDBCardTitle>
                       <ul>
                         {projects && projects.length > 0 ? (
-                            projects.filter(project => project.status === 'open').map(project => (
+                            projects.filter(project => project.status === 'in progress').map(project => (
                               <li key={project.id}>
                                 <div className="d-flex flex-row">
                                   <Link to={`/project/${project.id}`}>{project.title}</Link>

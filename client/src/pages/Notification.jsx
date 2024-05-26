@@ -37,37 +37,65 @@ function Notification() {
         }
     }, [user]);
 
+    const handleReadChange = async (messageId, currentIndex) => {
+        const newMessageList = [...messageList];
+        newMessageList[currentIndex].read = true;
+        setMessageList(newMessageList);
 
+        const { error } = await supabase
+            .from('messages')
+            .update({ read: true })
+            .eq('id', messageId);
 
-
-
-
-
+        if (error) {
+            console.error('Error updating message:', error);
+        }
+    };
 
     return (
         <div className='vw-100 background'>
             <NavBarMain className="fixed-top"/>
             <div className='custom-card m-5'>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                    <th className="col-1">Date</th>
-                    <th>Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {messageList.map((message, index) => (
-                        <tr key={index}>
-                            <td>{message.created_at}</td>
-                            <td>{message.message}</td>
+                {messageList.length == 0 ? (
+                    <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th className="col-1">Date</th>
+                            <th className="col-1">Read</th>
+                            <th>Message</th>
                         </tr>
-                    ))}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">You don't have any notifications yet.</td>
+                        </tr>
+                    </tbody>
+                </Table>
+                ) : (
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th className="col-1">Date</th>
+                                <th className="col-1">Read</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {messageList.map((message, index) => (
+                                <tr key={index}>
+                                    <td>{message.created_at}</td>
+                                    <td className='text-center'>
+                                        <input type="checkbox" checked={message.read} onChange={() => handleReadChange(message.id, index)} disabled={message.read} />
+                                    </td>
+                                    <td style={{ fontWeight: message.read ? 'normal' : 'bold' }}>{message.message}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                )}
             </div>
         </div>
       );
     }
 
 export default Notification;
-

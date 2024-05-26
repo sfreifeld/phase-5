@@ -46,7 +46,7 @@ export default function ProfileOrg() {
             setProfilePic(newProfilePicUrl);
           }
         });
-    }
+    }, accept: 'image/*'
   });
 
   // toggles profile to edit mode
@@ -74,9 +74,13 @@ export default function ProfileOrg() {
 //handles logic for changing profile elements while in edit mode
     const handleAddTag = (tag) => {
       if (tag && !tags.includes(tag)) {
-          setTags([...tags, tag])
-      }
-  }
+        if (tags.length < 8) {
+            setTags([...tags, tag]);
+        } else {
+            alert('You can only add up to 8 tags.');
+        }
+    }
+}
 
   const handleRemoveTag = (tag) => {
       setTags(tags.filter(t => t !== tag))
@@ -84,7 +88,12 @@ export default function ProfileOrg() {
                               
 
   const handleDescriptionChange = (event) => {
-      setEditableDescription(event.target.value);
+      const newDescription = event.target.value;
+      if (newDescription.length <= 500) {
+          setEditableDescription(newDescription);
+      } else {
+          alert('Description must be less than 500 characters.');
+      }
   };
 
 
@@ -239,7 +248,7 @@ export default function ProfileOrg() {
                 <MDBCardBody className="p-4">
                   <div className="d-flex text-black">
                     <div className="flex-grow-1 ms-3">
-                    {user.id == id ? (
+                    {user.profile_id == id ? (
                     <MDBCardTitle>Organization Description <i className={`bi ${isEditing ? 'bi-check-lg' : 'bi-pencil'}`} onClick={handleEditClick}></i></MDBCardTitle>
                     ) : (<MDBCardTitle>Organization Description</MDBCardTitle>)}
                       { isEditing ? (
@@ -250,10 +259,11 @@ export default function ProfileOrg() {
                             <MDBCardText dangerouslySetInnerHTML={{ __html: editableDescription.replace(/\n/g, '<br />') }}></MDBCardText>
                         )}
                       <MDBCardTitle className = "mt-4"> Tags </MDBCardTitle> 
+                      {isEditing && (<p className="fw-light fst-italic">8 max</p>)}
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2">
                         {tags.map(tag => (
                           <div key={tag} className="me-2">
-                          <p className="mb-0 bg-primary rounded-pill p-2">{tag}
+                          <p className="mb-0 btn">{tag}
                             {isEditing && <i className="bi bi-x-circle m-1" onClick={() => handleRemoveTag(tag)}></i>}
                           </p>
                         </div>
