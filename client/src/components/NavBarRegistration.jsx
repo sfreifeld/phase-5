@@ -13,7 +13,7 @@ function NavBarRegistration() {
     return (
         <Navbar bg="primary" data-bs-theme="dark">
             <Container>
-            <Navbar.Brand href="#home">Phase 5</Navbar.Brand>
+            <Navbar.Brand href="#home">DevImpact</Navbar.Brand>
             <Button variant="outline-light" onClick={() => supabase.auth.signOut()}>Sign out</Button>
             </Container>
         </Navbar>

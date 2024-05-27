@@ -32,7 +32,30 @@ function ApplicantList() {
         }
     }
 
-
+    // New function to handle project completion
+    const handleCompleteProject = () => {
+        if (window.confirm('Are you sure you want to mark this project as complete?')) {
+            // Trigger confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            // Update the project status in your database
+            supabase
+                .from('projects')
+                .update({ status: 'closed' }) // Set status to 'closed'
+                .eq('id', id) // Ensure you update the correct project using the id
+                .then(({ data, error }) => {
+                    if (error) {
+                        console.error('Error updating project status:', error);
+                    } else {
+                        console.log('Project status updated successfully:', data);
+                        setStatus('closed'); // Update local state to reflect the change
+                    }
+                });
+        }
+    };
 
     //Gets status of project and which dev owns it, if it has been assigned
     useEffect(() => {
@@ -135,12 +158,14 @@ function ApplicantList() {
 
     return (
         <div className='m-5'>
-            { status ? (
-                <h3 className="mb-3" style={{ color: getStatusColor(status) }}>
+            
+            { status == 'in progress' && (
+                <div className='d-flex'>
+                <h3 className="mb-3 me-3" style={{ color: getStatusColor(status) }}>
                     Project Status: {capitalizeWords(status)}
                 </h3>
-            ) : (
-                <h3>Loading...</h3>
+                <button className='complete-btn' onClick={handleCompleteProject}>Project Complete</button>
+                </div>
             )}
             {status == 'open' && Object.keys(applicants).length > 0 && userType == 'org' && (
                 <>

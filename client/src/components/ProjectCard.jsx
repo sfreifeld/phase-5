@@ -55,22 +55,22 @@ function ProjectCard({project}) {
 
     return (
         <div className={`m-5 custom-card ${getCardBorderClass()}`}>
-            <div className="d-flex justify-content-between">
-                <p className='card-title'>{capitalizeWords(project.status)}</p>
-                <p className='card-date text-right'>{new Date(project.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-            </div>
-            <p className='card-title'>{project.title}</p>
-            <div className='d-flex flex-row'>
-                <img style={{ width: '15%' }} src={org ? `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${org.profile_id}` : ''}/>
-                <div className='m-3'>
+            <div className="row">
+                <div className="col-12 col-md-4">
+                    <img className='img-fluid' src={org ? `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${org.profile_id}` : ''}/>
+                </div>
+                <div className="col-12 col-md-8">
+                    <div className="d-flex justify-content-between">
+                        <p className='card-title'>{capitalizeWords(project.status)}</p>
+                        <p className='card-date text-right'>{new Date(project.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                    <p className='card-title'>{project.title}</p>
                     <p>{org && org.org_name}</p>
                     <p>{project.description}</p>
-                    <div className='d-flex flex-row mb-3' >
-                        { 
-                        tags && tags.map(tag => (
-                            <p className='card-tags' key={tag}> {tag} </p>
-                            ))
-                        }
+                    <div className='d-flex flex-wrap'>
+                        {tags && tags.map(tag => (
+                            <p className='card-tags m-1' key={tag}> {tag} </p>
+                        ))}
                     </div>
                     <button className='btn' onClick={handleDetailsClick}>Get more details</button>
                 </div>

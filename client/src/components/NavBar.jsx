@@ -17,7 +17,7 @@ function NavBarMain() {
     return (
         <Navbar bg="primary" data-bs-theme="dark">
             <Container>
-            <Navbar.Brand href="#home">Phase 5</Navbar.Brand>
+            <Navbar.Brand href="#home">DevImpact</Navbar.Brand>
             <Nav className="me-auto">
                 <Nav.Link href="/">Home</Nav.Link>
                 {user && (

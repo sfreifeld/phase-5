@@ -264,7 +264,7 @@ export default function ProfileDev() {
     return (
         <div className="vh-100 vw-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <NavBarMain></NavBarMain>
-        <MDBContainer>
+        <MDBContainer className="custom-container">
           <MDBRow className="justify-content-left d-flex align-items-stretch">
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
               <MDBCard className="custom-card" style={{ borderRadius: '15px', height: '100%' }}>
@@ -278,6 +278,7 @@ export default function ProfileDev() {
                         </div>
                     ) : (
                       <MDBCardImage
+                        className="img-thumbnail"
                         style={{ width: '180px', borderRadius: '10px' }}
                         src={profileImageUrl}
                         alt='Profile image'
@@ -292,7 +293,7 @@ export default function ProfileDev() {
                         style={{ backgroundColor: '#efefef' }}>
                         <div>
                           <p className="small text-muted mb-1">Projects</p>
-                          <p className="mb-0">{projects.length}</p>
+                          <p className="mb-0">{projects.filter(project => project.status === 'completed').length}</p>
                         </div>
                         <div className="px-3">
                           <p className="small text-muted mb-1">Hours</p>

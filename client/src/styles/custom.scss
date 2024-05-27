@@ -69,10 +69,20 @@ html, body {
     padding: 15px;
     color: $font;
     background-color: white;
+    overflow: hidden; /* Prevents overflow */
+}
 
- }
+@media (max-width: 768px) {
+    .custom-card {
+        padding: 10px; /* Smaller padding for smaller screens */
+    }
+    .btn-responsive {
+        padding: 5px 10px; /* Smaller padding inside buttons */
+        font-size: 0.8rem; /* Smaller font size for text inside buttons */
+    }
+}
 
- .in-progress {
+.in-progress {
    border: 2px solid #d4e2fb; // Added 'solid' and '2px' to specify the style and width of the border
 
 }
@@ -117,4 +127,60 @@ html, body {
    min-height: 100vh;
    width: 100vw;
    padding-bottom: 50px;
+}
+
+.custom-container {
+   padding: 15px; /* Adjust padding to ensure content does not touch the edges */
+   overflow-x: auto; /* Handles horizontal overflow by adding a scrollbar */
+   overflow-y: hidden; /* Prevents vertical overflow */
+}
+
+.negative-margin {
+   margin-left: -10px;
+}
+
+@media (max-width: 768px) {
+   .custom-container {
+      max-width: 30%;
+   }
+   .custom-card {
+       padding: 10px;  // Reduce padding on smaller screens
+   }
+   .card-tags {
+       margin: 0.5rem; // Adjust tag spacing on smaller screens
+   }
+}
+
+
+.complete-btn {
+   background-color: rgb(45, 186, 45);
+   align-items: center;
+   font-family: 'Karla', sans-serif;
+   font-weight: 400;
+   border: 0;
+   border-radius: 100px;
+   box-sizing: border-box;
+   color: #ffffff;
+   cursor: pointer;
+   display: inline-flex;
+   font-size: 16px;
+   justify-content: center;
+   line-height: 20px;
+   max-width: 480px;
+   min-height: 40px;
+   min-width: 0px;
+   overflow: hidden;
+   padding: 0px;
+   padding-left: 20px;
+   padding-right: 20px;
+   text-align: center;
+   touch-action: manipulation;
+   transition: background-color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+   user-select: none;
+   -webkit-user-select: none;
+}
+
+.complete-btn:hover {
+  background-color:#278e2a;
+  color: white;
 }

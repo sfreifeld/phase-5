@@ -4,8 +4,10 @@ import ProjectCard from "./ProjectCard"
 import React, { useState, useEffect } from 'react';
 import SearchBar from "./SearchBar";
 import HomeHero from "./HomeHero";
+import { useSession } from './SessionContext'
 
 function Home( ) {
+  const { user } = useSession()
   const [projects, setProjects] = useState([]); // Original fetched projects
   const [displayedProjects, setDisplayedProjects] = useState([]); // Projects to display (sorted)
   const [sortType, setSortType] = useState('')
@@ -22,6 +24,7 @@ function Home( ) {
     supabase
       .from('projects')
       .select('*')
+      .not('status', 'eq', 'deleted') // Add this line to filter out 'deleted' projects
       .then(({ data, error }) => {
         if (error) {
           console.error('Error fetching projects:', error);

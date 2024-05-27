@@ -9,10 +9,10 @@ function About() {
         <NavBarMain/>
         <div className='custom-card d-flex m-5'>
         <div className='col-md-6 m-3 p-3'>
-                <h2>About Phase 5</h2>
-                <p> Welcome to Phase 5 Project! Our mission is to bridge the gap between aspiring developers and nonprofits in need of technical assistance. We believe in the power of technology to drive positive change, and we're here to make it easier for entry-level developers to gain valuable experience while supporting causes they care about.</p>
+                <h2>About DevImpact</h2>
+                <p> Welcome to DevImpact! Our mission is to bridge the gap between aspiring developers and nonprofits in need of technical assistance. We believe in the power of technology to drive positive change, and we're here to make it easier for entry-level developers to gain valuable experience while supporting causes they care about.</p>
                 <h3>Our Mission</h3>
-                <p>At Phase 5 Project, we aim to:</p>
+                <p>At DevImpact, we aim to:</p>
                 <ul>
                     <li><span className='fw-bold'>Empower Developers:</span> Provide entry-level developers with real-world projects to build their portfolios and enhance their skills.</li>
                     <br></br>
@@ -29,7 +29,7 @@ function About() {
                     <li><span className='fw-bold'>Collaboration and Completion:</span> Once selected, developers and nonprofits collaborate to complete the project. Developers gain hands-on experience, and nonprofits receive valuable technical support.</li>
                 </ol>
                 <br></br>
-                <p>Thank you for being a part of Phase 5 Project. Together, we can make a difference through technology and collaboration!</p>
+                <p>Thank you for being a part of DevImpact. Together, we can make a difference through technology and collaboration!</p>
             </div>
             <div className='col-md-6'>
                 <h2 className='m-3 p-3'>FAQ's</h2>
@@ -53,10 +53,10 @@ function About() {
         </div>
         <div className='custom-card m-5'>
             <p id='1' className='fw-bold'>Is there a cost to use the platform?</p>
-            <p>No, Phase 5 Project is completely free for both developers and nonprofits. We are committed to providing this service without any financial barriers.</p>
+            <p>No, DevImpact is completely free for both developers and nonprofits. We are committed to providing this service without any financial barriers.</p>
             <br></br>
             <p id='2' className='fw-bold'>How do I post a project?</p>
-            <p>Nonprofits can sign up for an account and use the "Post a Project" feature to detail their project needs, including deadlines, required skills, and project scope.</p>
+            <p>Nonprofits can sign up for an account and use the "Create a Project" feature located on the top of the screen to detail their project needs, including deadlines, required skills, and project scope.</p>
             <br></br>
             <p id='3' className='fw-bold'>How do developers apply for projects?</p>
             <p>Developers can browse the available projects, filter by their skills and interests, and apply directly through the platform. Nonprofits will review applications and select the best fit for their project.</p>
@@ -65,13 +65,13 @@ function About() {
             <p>Any technical project can be posted, including website development, app creation, database management, and more. If you have a project in mind, feel free to post it!</p>
             <br></br>
             <p id='5' className='fw-bold'>How is the collaboration managed?</p>
-            <p>Once a developer is selected for a project, they can communicate directly with the nonprofit through our platform's messaging system. We encourage regular updates and clear communication to ensure successful project completion.</p>
+            <p>Once a developer is selected for a project, they will recieve an email from the nonprofit. We encourage regular updates and clear communication to ensure successful project completion.</p>
             <br></br>
             <p id='6' className='fw-bold'>What happens after a project is completed?</p>
             <p>After completing a project, developers can request a testimonial from the nonprofit, which can be added to their portfolio. Nonprofits can also leave reviews for developers, helping to build their reputation in the community.</p>
             <br></br>
             <p id='7' className='fw-bold'>Who should I contact for support or more information?</p>
-            <p>If you have any questions or need support, please contact us at support@phase5project.com. We're here to help!</p>
+            <p>If you have any questions or need support, please contact us at support@devimpact.com. We're here to help!</p>
             <br></br>
         
         </div>

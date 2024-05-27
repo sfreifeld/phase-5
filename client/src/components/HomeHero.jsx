@@ -31,7 +31,7 @@ function HomeHero() {
             </div>
             <Row className="mt-5 align-items-center justify-content-center" style={{ height: '100%', position: 'relative', zIndex: '3' }}>
                 <Col xs={12} md={8} lg={6} className="text-center">
-                    <h1 className="display-4">Phase 5 Project</h1>
+                    <h1 className="display-4">DevImpact</h1>
                     <p className="lead">Browse projects proposed by nonprofits to gain experience and code for a cause!</p>
                     <button className="btn" onClick={handleLearnMoreClick}>Learn More</button>
                 </Col>

@@ -98,17 +98,19 @@ export default function ProfileOrg() {
 
 
   const handleDeleteProject = (projectId) => {
-    if (window.confirm("Are you sure you want to delete this project?  This action is irreversible.")) {
+    if (window.confirm("Are you sure you want to mark this project as deleted? This action is irreversible.")) {
       supabase
         .from('projects')
-        .delete()
+        .update({ status: 'deleted' }) // Set the status to 'deleted'
         .eq('id', projectId)
-        .then(({ error }) => {
+        .then(({ data, error }) => {
           if (error) {
-            console.error('Error deleting project:', error);
+            console.error('Error marking project as deleted:', error);
           } else {
-            setProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
-            console.log('Project deleted successfully');
+            setProjects(prevProjects => prevProjects.map(project => 
+              project.id === projectId ? { ...project, status: 'deleted' } : project
+            ));
+            console.log('Project marked as deleted successfully');
           }
         });
     }
@@ -154,7 +156,7 @@ export default function ProfileOrg() {
     return (
       <div className="vh-100 vw-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <NavBarMain ></NavBarMain>
-        <MDBContainer>
+        <MDBContainer className="custom-container">
           <MDBRow className="justify-content-left">
 
             <MDBCol md="6" lg="6" xl="6" className="mt-5">
@@ -169,6 +171,7 @@ export default function ProfileOrg() {
                         </div>
                     ) : (
                       <MDBCardImage
+                        className="img-thumbnail"
                         style={{ width: '180px', borderRadius: '10px' }}
                         src={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}`}
                         alt='Generic placeholder image'
@@ -290,6 +293,7 @@ export default function ProfileOrg() {
       </div>
     );
   }
+  
   
   
   
