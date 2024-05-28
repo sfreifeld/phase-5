@@ -25,7 +25,7 @@ function NavBarMain() {
                 )}
                 { userType == 'org' && user ?
                 (<Nav.Link href="/createproject" className='text-white'>Create Project +</Nav.Link>) :
-                (<Nav.Link href={`/notifications/${user.profile_id}`} className='text-white'>Notifications</Nav.Link>)
+                (<Nav.Link href='/notifications' className='text-white'>Notifications</Nav.Link>)
                 }
                 <Nav.Link href="/about">About</Nav.Link>
             </Nav>

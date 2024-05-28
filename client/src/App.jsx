@@ -53,7 +53,7 @@ export default function App() {
         <Route path="/profile/:id" element={getProfileComponent(userType)} />
         <Route path="/project/:id" element= {<ProjectDetail />} />
         <Route path="/createproject" element= {<CreateProject />} />
-        <Route path="/notifications/:id" element= {<Notification />} />
+        <Route path="/notifications" element= {<Notification />} />
         <Route path="/about" element= {<About/>} />
       </Routes>
     </Router>
