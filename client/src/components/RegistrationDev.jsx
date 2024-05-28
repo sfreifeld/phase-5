@@ -48,7 +48,7 @@ function RegistrationDev() {
     console.log('Updated user:', user);
     console.log('Updated usertype:', userType);
     // Ensure user and userType are defined and user has a profile_id
-    if (userType && user.profile_id) {
+    if (user && userType && user.profile_id) {
       navigate('/');
     }
   }, [user, userType]);
