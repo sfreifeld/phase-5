@@ -47,7 +47,7 @@ function RegistrationDev() {
   useEffect(() => {
     console.log('Updated user:', user);
     console.log('Updated usertype:', userType);
-    if (user || userType) {
+    if (user && userType) {
         navigate('/');
     }
 }, [user, userType]);
