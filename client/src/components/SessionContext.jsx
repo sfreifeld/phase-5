@@ -16,7 +16,7 @@ export const SessionProvider = ({ children }) => {
       setSession(prevSession => ({ ...prevSession, ...newSessionData }));
     };
 
-    function updateUser(userData, callback) {
+    function updateUser(userData) {
         setUser(userData)
         console.log('User updated:', userData);  // Call the callback function after update is done
       }
@@ -24,6 +24,7 @@ export const SessionProvider = ({ children }) => {
 
     function updateUserType(type) {
         setUserType(type)
+        console.log('User type updated:', userData);
         }
 
     useEffect(() => {

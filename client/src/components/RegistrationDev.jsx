@@ -47,10 +47,11 @@ function RegistrationDev() {
   useEffect(() => {
     console.log('Updated user:', user);
     console.log('Updated usertype:', userType);
-    if (user && userType) {
-        navigate('/');
+    // Ensure user and userType are defined and user has a profile_id
+    if (userType && user.profile_id) {
+      navigate('/');
     }
-}, [user, userType]);
+  }, [user, userType]);
 
   // Regex to check the username criteria
   const validateUsername = (username) => {
