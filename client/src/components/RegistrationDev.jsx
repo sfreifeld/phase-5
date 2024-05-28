@@ -34,6 +34,7 @@ function RegistrationDev() {
               } else {
                 console.log(insertData)
                 updateUserType('dev')
+                console.log(insertData[0])
                 updateUser(insertData[0])
 
               }

@@ -19,7 +19,7 @@ export const SessionProvider = ({ children }) => {
     function updateUser(userData) {
         setUser(userData)
         console.log('User updated:', userData);  // Call the callback function after update is done
-      }
+      } 
 
 
     function updateUserType(type) {
