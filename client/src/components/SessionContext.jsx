@@ -24,7 +24,7 @@ export const SessionProvider = ({ children }) => {
 
     function updateUserType(type) {
         setUserType(type)
-        console.log('User type updated:', userData);
+        console.log('User type updated:', type);
         }
 
     useEffect(() => {
