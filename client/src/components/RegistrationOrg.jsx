@@ -30,7 +30,7 @@ function RegistrationOrg() {
               } else {
                 console.log('Data added successfully to users table:', insertData);
                 updateUserType('org')
-                updateUser(insertData)
+                updateUser(insertData[0])
               }
             });
         } else {
@@ -38,6 +38,15 @@ function RegistrationOrg() {
         }
       });
   };
+
+  useEffect(() => {
+    console.log('Updated user:', user);
+    console.log('Updated usertype:', userType);
+    // Ensure user and userType are defined and user has a profile_id
+    if (user && userType && user.profile_id) {
+      navigate('/');
+    }
+  }, [user, userType]);
   
 
   const validateOrgName = (orgName) => {
