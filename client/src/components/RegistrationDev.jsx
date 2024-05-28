@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 function RegistrationDev() {
   const [errors, setErrors] = useState({});
-  const { session, user } = useSession();
+  const { session, user, updateSession } = useSession();
   const navigate = useNavigate();
   //takes automatically created user data from supabase and copies to custom table
   function transferProfileDataToUserTable(userId, username, fullName) {
@@ -32,6 +32,8 @@ function RegistrationDev() {
                 console.error('Error inserting data into users table:', insertError);
               } else {
                 console.log('Data added successfully to users table:', insertData);
+                // Update session context here
+                updateSession({ user: { ...session.user, username, fullName } });
                 navigate('/'); // Navigate to home after successful insertion
               }
             });

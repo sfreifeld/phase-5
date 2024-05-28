@@ -12,6 +12,10 @@ export const SessionProvider = ({ children }) => {
     const [profile, setProfile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);  // Added loading state
 
+    const updateSession = (newSessionData) => {
+      setSession(prevSession => ({ ...prevSession, ...newSessionData }));
+    };
+
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
           setSession(session);
@@ -85,7 +89,7 @@ export const SessionProvider = ({ children }) => {
     }
 
     return (
-        <SessionContext.Provider value={{ session, user, userType, isLoading }}>
+        <SessionContext.Provider value={{ session, user, userType, isLoading, updateSession }}>
             {children}
         </SessionContext.Provider>
     );
