@@ -32,6 +32,7 @@ function RegistrationDev() {
               if (insertError) {
                 console.error('Error inserting data into users table:', insertError);
               } else {
+                console.log(insertData)
                 updateUserType('dev')
                 updateUser(insertData[0])
 
