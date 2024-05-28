@@ -33,8 +33,8 @@ function RegistrationDev() {
                 console.error('Error inserting data into users table:', insertError);
               } else {
                 console.log(insertData)
-                updateUserType('dev')
                 console.log(insertData[0])
+                updateUserType('dev')
                 updateUser(insertData[0])
 
               }
