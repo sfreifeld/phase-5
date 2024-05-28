@@ -6,13 +6,13 @@ import { useSession } from './SessionContext';
 
 function RegistrationOrg() {
   const [errors, setErrors] = useState({});
-  const { session } = useSession();
+  const { session, user, updateSession, updateUser, userType, updateUserType } = useSession();
 
   function transferProfileDataToOrgTable(orgId, orgName, websiteUrl, sector) {
     supabase
       .from('profiles')
       .select('*')
-      .eq('id', orgId)
+      .eq('uuid', orgId)
       .then(({ data: profilesData, error: selectError }) => {
         if (selectError) {
           console.error('Error fetching profile:', selectError);
@@ -23,11 +23,14 @@ function RegistrationOrg() {
             .insert([
               { profile_id: profile.id, org_name: orgName, website_url: websiteUrl, sector: sector }
             ])
+            .select('*')
             .then(({ data: insertData, error: insertError }) => {
               if (insertError) {
                 console.error('Error inserting data into users table:', insertError);
               } else {
                 console.log('Data added successfully to users table:', insertData);
+                updateUserType('org')
+                updateUser(insertData)
               }
             });
         } else {
@@ -42,7 +45,7 @@ function RegistrationOrg() {
   };
 
   const validateSector = (sector) => {
-    return /^[a-zA-Z]+$/.test(sector);
+    return /^[a-zA-Z ]+$/.test(sector);
   };
 
   const handleSubmit = (event) => {
@@ -60,7 +63,7 @@ function RegistrationOrg() {
     }
 
     if (!validateSector(sector)) {
-      setErrors(errors => ({ ...errors, sector: 'Sector must only contain letters.' }));
+      setErrors(errors => ({ ...errors, sector: 'Sector must only contain letters and spaces.' }));
       return;
     }
 

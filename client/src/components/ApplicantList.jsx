@@ -10,7 +10,9 @@ function ApplicantList() {
     const [selectedApplicant, setSelectedApplicant] = useState(null);
     const [ status , setStatus] = useState('')
     const [ dev, setDev] = useState({})
-    const { userType } = useSession();
+    const { userType, user } = useSession();
+    const [ project, setProject ] = useState(null)
+
 
 
     //Helper function to change status value to correct capitalization
@@ -68,6 +70,7 @@ function ApplicantList() {
                     console.log(id)
                     console.error('Error fetching project:', projectError);
                 } else if (projectData[0].status) {
+                    setProject(projectData[0])
                     setStatus(projectData[0].status);
                     console.log(projectData[0])
                     if (projectData[0].user_id) { // Check if user_id is not null
@@ -159,14 +162,16 @@ function ApplicantList() {
     return (
         <div className='m-5'>
             
-            { status == 'in progress' && (
+
                 <div className='d-flex'>
                 <h3 className="mb-3 me-3" style={{ color: getStatusColor(status) }}>
                     Project Status: {capitalizeWords(status)}
                 </h3>
-                <button className='complete-btn' onClick={handleCompleteProject}>Project Complete</button>
+                {status == 'in progress' && userType == 'org' && project.org_id == user.id ? (
+                    <button className='complete-btn' onClick={handleCompleteProject}>Project Complete</button>
+                ) : null}
                 </div>
-            )}
+        
             {status == 'open' && Object.keys(applicants).length > 0 && userType == 'org' && (
                 <>
                     <h3 className="mb-3">Are you ready to choose a developer for this project?</h3>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { supabase } from "../supabaseClient"
@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 function RegistrationDev() {
   const [errors, setErrors] = useState({});
-  const { session, user, updateSession } = useSession();
+  const { session, user, updateSession, updateUser, userType, updateUserType } = useSession();
   const navigate = useNavigate();
   //takes automatically created user data from supabase and copies to custom table
   function transferProfileDataToUserTable(userId, username, fullName) {
@@ -27,14 +27,14 @@ function RegistrationDev() {
             .insert([
               { profile_id: profile.id, username: username, full_name: fullName}
             ])
+            .select('*')
             .then(({ data: insertData, error: insertError }) => {
               if (insertError) {
                 console.error('Error inserting data into users table:', insertError);
               } else {
-                console.log('Data added successfully to users table:', insertData);
-                // Update session context here
-                updateSession({ user: { ...session.user, username, fullName } });
-                navigate('/'); // Navigate to home after successful insertion
+                updateUserType('dev')
+                updateUser(insertData)
+
               }
             });
         } else {
@@ -42,6 +42,15 @@ function RegistrationDev() {
         }
       });
   };
+
+
+  useEffect(() => {
+    console.log('Updated user:', user);
+    console.log('Updated usertype:', userType);
+    if (user || userType) {
+        navigate('/');
+    }
+}, [user, userType]);
 
   // Regex to check the username criteria
   const validateUsername = (username) => {

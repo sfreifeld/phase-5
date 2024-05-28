@@ -69,7 +69,7 @@ function ProjectCard({project}) {
                     <p>{project.description}</p>
                     <div className='d-flex flex-wrap'>
                         {tags && tags.map(tag => (
-                            <p className='card-tags m-1' key={tag}> {tag} </p>
+                            <p className='card-tags me-3 mb-3' key={tag}> {tag} </p>
                         ))}
                     </div>
                     <button className='btn' onClick={handleDetailsClick}>Get more details</button>

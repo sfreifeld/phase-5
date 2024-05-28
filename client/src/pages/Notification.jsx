@@ -31,7 +31,7 @@ function Notification() {
                             created_at: new Date(message.created_at).toLocaleDateString('en-US', {
                                 year: 'numeric', month: 'long', day: 'numeric'
                             })
-                        })));
+                        })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))); // Sorting here
                     }
                 });
         }

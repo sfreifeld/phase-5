@@ -16,6 +16,16 @@ export const SessionProvider = ({ children }) => {
       setSession(prevSession => ({ ...prevSession, ...newSessionData }));
     };
 
+    function updateUser(userData, callback) {
+        setUser(userData)
+        console.log('User updated:', userData);  // Call the callback function after update is done
+      }
+
+
+    function updateUserType(type) {
+        setUserType(type)
+        }
+
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
           setSession(session);
@@ -89,7 +99,7 @@ export const SessionProvider = ({ children }) => {
     }
 
     return (
-        <SessionContext.Provider value={{ session, user, userType, isLoading, updateSession }}>
+        <SessionContext.Provider value={{ session, user, userType, isLoading, updateSession, updateUser, updateUserType }}>
             {children}
         </SessionContext.Provider>
     );

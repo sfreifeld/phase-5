@@ -17,15 +17,37 @@ export default function ProfileOrg() {
   const [tags, setTags] = useState([])
   const { id } = useParams();
   const { session, user } = useSession();
+  const [profileImageUrl, setProfileImageUrl] = useState('');
 
   if (!user) {
     return <div>Loading...</div>;
   }
 
+  useEffect(() => {
+    const imageUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}`;
+    fetch(imageUrl)
+        .then(response => {
+            if (response.ok) {
+                setProfileImageUrl(imageUrl);
+            } else {
+                setProfileImageUrl('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg'); // Default image URL
+            }
+        })
+        .catch(() => {
+            setProfileImageUrl('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg'); // Default image URL on error
+        });
+}, [user.profile_id]); 
+
   // handles the logic for when a person drops a file for their profile picture
   const {getRootProps, getInputProps} = useDropzone({
     onDrop: acceptedFiles => {
       const file = acceptedFiles[0];
+
+      if (!file.type.startsWith('image/')) {
+        alert('Profile pictures must be either a .jpeg, .png, or .gif');
+        return; // Stop the function if the file is not an image
+      }
+
       const formData = new FormData();
       formData.append('file', file);
 
@@ -43,7 +65,7 @@ export default function ProfileOrg() {
             console.log('File uploaded successfully:', data);
             // Optimistically update the profile picture URL in state
             const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}?${new Date().getTime()}`;
-            setProfilePic(newProfilePicUrl);
+            setProfileImageUrl(newProfilePicUrl);
           }
         });
     }, accept: 'image/*'
@@ -173,7 +195,7 @@ export default function ProfileOrg() {
                       <MDBCardImage
                         className="img-thumbnail"
                         style={{ width: '180px', borderRadius: '10px' }}
-                        src={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}`}
+                        src={profileImageUrl}
                         alt='Generic placeholder image'
                         fluid /> )}
                     </div>
@@ -213,7 +235,7 @@ export default function ProfileOrg() {
                       <MDBCardTitle>Previous Projects</MDBCardTitle>
                       <ul>
                         {projects && projects.length > 0 ? (
-                            projects.filter(project => project.status !== 'open').map(project => (
+                            projects.filter(project => project.status == 'closed').map(project => (
                               <li key={project.id}>
                                 <Link to={`/project/${project.id}`}>{project.title}</Link>
                             </li>
