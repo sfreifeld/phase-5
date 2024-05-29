@@ -17,15 +17,15 @@ function NavBarMain() {
     return (
         <Navbar bg="primary" data-bs-theme="dark">
             <Container>
-            <Navbar.Brand href="#home">DevImpact</Navbar.Brand>
+            <Navbar.Brand href="/">DevImpact</Navbar.Brand>
             <Nav className="me-auto">
                 <Nav.Link href="/">Home</Nav.Link>
                 {user && (
                     <Nav.Link href={`/profile/${user.profile_id}`}>Profile</Nav.Link>
                 )}
                 { userType == 'org' && user ?
-                (<Nav.Link href="/createproject" className='text-white'>Create Project +</Nav.Link>) :
-                (<Nav.Link href='/notifications' className='text-white'>Notifications</Nav.Link>)
+                (<Nav.Link href="/createproject">Create Project +</Nav.Link>) :
+                (<Nav.Link href='/notifications'>Notifications</Nav.Link>)
                 }
                 <Nav.Link href="/about">About</Nav.Link>
             </Nav>

@@ -53,9 +53,9 @@ function Home( ) {
     }
 
     // Apply sort
-    if (sortType === 'Posted Date') {
+    if (sortType == 'postedDate') {
       filteredProjects.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    } else if (sortType === 'Project Length') {
+    } else if (sortType == 'projectLength') {
       filteredProjects.sort((a, b) => lengthSortOrder[a.project_length] - lengthSortOrder[b.project_length]);
     }
 
@@ -66,7 +66,14 @@ function Home( ) {
     <div className="min-vh-100 vw-100 background">
         <NavBarMain className="fixed-top"></NavBarMain>
         <HomeHero className=""></HomeHero>
-        <SearchBar setSortType={setSortType} setSearchQuery={setSearchQuery} setFilterType={setFilterType}className=""/>
+        <SearchBar 
+          setSortType={setSortType} 
+          sortType={sortType}
+          setSearchQuery={setSearchQuery} 
+          setFilterType={setFilterType}
+          filterType={filterType} // Pass filterType to SearchBar
+          className=""
+        />
         {displayedProjects.map(project => (
         <ProjectCard key={project.id} project={project}/>
       ))}

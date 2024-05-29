@@ -6,8 +6,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient"
 import { Dropdown } from 'react-bootstrap';
 import { useSession } from './SessionContext'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark   } from '@fortawesome/free-solid-svg-icons';
 
-function SearchBar({ setSortType, setSearchQuery, setFilterType }) {
+function SearchBar({ setSortType, setSearchQuery, setFilterType, filterType, sortType, className }) {
   const { userType } = useSession();
   const [inputValue, setInputValue] = useState('');
 
@@ -25,14 +27,22 @@ function SearchBar({ setSortType, setSearchQuery, setFilterType }) {
     setSearchQuery(inputValue);
   }
 
+  const handleClearFilters = () => {
+    setFilterType(''); // Reset filter type to default state
+  }
+
   useEffect(() => {
     if (userType === 'dev') {
       setFilterType('open');
     }
   }, [userType]);
 
+  useEffect(() => {
+    console.log('Sort Type in SearchBar:', sortType);
+  }, [sortType]);
+
   return (
-    <div className="search container-fluid border-bottom">
+    <div className={`${className} search container-fluid border-bottom`}>
       <div className="row height d-flex justify-content-start align-items-center">
         <div className="col-md-6">
           <div className="form d-flex flex-row">
@@ -44,23 +54,30 @@ function SearchBar({ setSortType, setSearchQuery, setFilterType }) {
               onChange={handleInputChange}
               value={inputValue}
             />
-            <Button onClick={handleSearchClick} className="me-3 rounded negative-margin">Search</Button>
+            <Button onClick={handleSearchClick} className="me-3 pe-4  ps-4 rounded negative-margin"> Search </Button>
 
             <Dropdown className='me-3'>
-              <Dropdown.Toggle> Sort By </Dropdown.Toggle>
+              <Dropdown.Toggle>Sort By</Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item onClick={() => setSortType('Posted Date')}>Posted Date</Dropdown.Item>
-                <Dropdown.Item onClick={() => setSortType('Project Length')}>Project Length</Dropdown.Item>
+                <Dropdown.Item onClick={() => { setSortType('postedDate'); console.log('Sort set to Posted Date'); }}>
+                  Posted Date {sortType === 'postedDate' && '✓'}
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => { setSortType('projectLength'); console.log('Sort set to Project Length'); }}>
+                  Project Length {sortType === 'projectLength' && '✓'}
+                </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             <Dropdown className='me-3'>
               <Dropdown.Toggle> Filter By </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item onClick={() => setFilterType('open')}>Open</Dropdown.Item>
-                <Dropdown.Item onClick={() => setFilterType('inProgress')}>In Progress</Dropdown.Item>
-                <Dropdown.Item onClick={() => setFilterType('closed')}>Closed</Dropdown.Item>
+                <Dropdown.Item onClick={() => setFilterType('open')}>Open {filterType === 'open' && '✓'}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setFilterType('inProgress')}>In Progress {filterType === 'inProgress' && '✓'}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setFilterType('closed')}>Closed {filterType === 'closed' && '✓'}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
+            <div onClick={handleClearFilters} className="mt-2" style={{ width: '100%' }}>
+              <FontAwesomeIcon  icon={faCircleXmark} style={{ color: "#6495ed" }} />
+            </div>
           </div>
         </div>
       </div>

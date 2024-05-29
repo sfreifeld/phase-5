@@ -218,8 +218,8 @@ export default function ProfileOrg() {
                         </div>
                       </div>
                       <div className="d-flex pt-1">
-                        <MDBBtn outline className="me-1 flex-grow-1">Chat</MDBBtn>
-                        <MDBBtn className="flex-grow-1">Follow</MDBBtn>
+                        <MDBBtn outline className="me-1 flex-grow-1 invisible">Chat</MDBBtn>
+                        <MDBBtn className="flex-grow-1 invisible">Follow</MDBBtn>
                       </div>
                     </div>
                   </div>

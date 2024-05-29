@@ -94,7 +94,7 @@ function ApplicantList() {
                     }
                 }
             });
-    }, [id]);
+    }, [id, status]);
 
 
     //Gets list of devs who have applied to project
