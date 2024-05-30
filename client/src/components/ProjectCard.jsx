@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "../supabaseClient"
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 
 function ProjectCard({project}) {
@@ -65,8 +66,10 @@ function ProjectCard({project}) {
                         <p className='card-date text-right'>{new Date(project.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     </div>
                     <p className='card-title'>{project.title}</p>
-                    <p>{org && org.org_name}</p>
-                    <p>{project.description}</p>
+                    {org && (
+                    <Link to={`/profile/${org.profile_id}`}>{org.org_name}</Link>
+                    )}
+                    <p  className='mt-3'>{project.description}</p>
                     <div className='d-flex flex-wrap'>
                         {tags && tags.map(tag => (
                             <p className='card-tags me-3 mb-3' key={tag}> {tag} </p>

@@ -5,9 +5,9 @@ import NavBarMain from "./NavBar";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { useSession } from './SessionContext'
 import { Link } from 'react-router-dom';
 import backgroundImage from '../assets/background-dev.jpg';
+import { useSession } from './SessionContext';
 
 export default function ProfileDev() {
     
@@ -17,13 +17,33 @@ export default function ProfileDev() {
     const [skills, setSkills] = useState([])
     const [profileImageUrl, setProfileImageUrl] = useState('');
     const { id } = useParams();
-    const { session, user } = useSession();
     const [applications, setApplications] = useState([])
     const [loading, setLoading] = useState(true); // Loading state
     const [resumeExists, setResumeExists] = useState(false);
+    const [profile, setProfile] = useState('')
+    const { user } = useSession();
+
+
+      useEffect(() => {
+      supabase
+        .from('users')
+        .select('*')
+        .eq('profile_id', id)
+        .single()
+        .then(response => {
+          if (response.data) {
+            setProfile(response.data);
+          } else {
+            console.error('Failed to fetch user data:', response.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+        });
+    },[id])
 
     useEffect(() => {
-        const imageUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}`;
+        const imageUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${id}`;
         fetch(imageUrl)
             .then(response => {
                 if (response.ok) {
@@ -35,15 +55,15 @@ export default function ProfileDev() {
             .catch(() => {
                 setProfileImageUrl('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg'); // Default image URL on error
             });
-    }, [user.profile_id]); // Dependency array to re-run this effect when user.profile_id changes
+    }, [id]); // Dependency array to re-run this effect when user.profile_id changes
 
     useEffect(() => {
-        if (user) {
+        if (profile) {
             setLoading(false);
         } else {
             setLoading(true);
         }
-    }, [user]); // Dependency on user object from session context
+    }, [profile]); // Dependency on user object from session context
 
     // handles the logic for when a person drops a file for their profile picture
     const {getRootProps, getInputProps} = useDropzone({
@@ -62,7 +82,7 @@ export default function ProfileDev() {
           supabase
             .storage
             .from('avatars')
-            .upload(`${user.profile_id}`, file, {
+            .upload(`${id}`, file, {
               cacheControl: '3600',
               upsert: true
             })
@@ -71,7 +91,7 @@ export default function ProfileDev() {
                 console.error('Error uploading file:', error);
               } else {
                 console.log('File uploaded successfully:', data);
-                const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}?${new Date().getTime()}`;
+                const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${id}?${new Date().getTime()}`;
                 setProfileImageUrl(newProfilePicUrl);
               }
             });
@@ -81,7 +101,7 @@ export default function ProfileDev() {
 
 
       const handleResumeUpload = async (file) => {
-        const filePath = `resumes/${user.id}/1`;
+        const filePath = `resumes/${id}/1`;
         const { data, error } = await supabase
             .storage
             .from('resumes')
@@ -100,7 +120,7 @@ export default function ProfileDev() {
     };
 
     const checkResumeExists = async () => {
-        const filePath = `resumes/${user.id}/1`;
+        const filePath = `resumes/${id}/1`;
         const { data, error } = await supabase
             .storage
             .from('resumes')
@@ -115,10 +135,10 @@ export default function ProfileDev() {
     };
 
     useEffect(() => {
-        if (user) {
+        if (profile) {
             checkResumeExists();
         }
-    }, [user]);
+    }, [profile]);
 
     // deletes user application from db
     const handleDeleteApplication = (projectId, userId) => {
@@ -187,11 +207,11 @@ export default function ProfileDev() {
 
     //gets list of projects for that user
     useEffect(() => {
-        if (user) {
+        if (profile) {
             supabase
                 .from('projects')
                 .select('*')
-                .eq('user_id', user.id)
+                .eq('user_id', profile.id)
                 .then(({ data: projectsData, error: projectsError }) => {
                     if (projectsError) {
                         console.error('Error fetching projects data:', projectsError);
@@ -200,15 +220,15 @@ export default function ProfileDev() {
                     setProjects(projectsData);
                 });
         }
-    }, [user]);
+    }, [profile]);
 
     //gets list of open aplications for the user
     useEffect(() => {
-        if (user) {
+        if (profile) {
             supabase
                 .from('applicants')
                 .select('*')
-                .eq('user_id', user.id)
+                .eq('user_id', profile.id)
                 .then(({ data: applicationData, error: userError }) => {
                     if (userError) {
                         console.error('Error fetching user data:', userError);
@@ -244,17 +264,17 @@ export default function ProfileDev() {
 
 
     useEffect(() => {
-        if (user) {
-          if (user.bio) {
-            setEditableBio(user.bio);
+        if (profile) {
+          if (profile.bio) {
+            setEditableBio(profile.bio);
           } else {
             setEditableBio("Here is your bio. You can write about your educational experience, your skills, and what you want to work on!");
           }
-          if (user.skills) {
-            setSkills(user.skills)
+          if (profile.skills) {
+            setSkills(profile.skills)
           }
         }
-      }, [user]);
+      }, [profile]);
 
 
     if (loading) {
@@ -286,8 +306,8 @@ export default function ProfileDev() {
                     </div>
                     <div className="flex-grow-1 ms-3">
 
-                      <MDBCardTitle>{user.full_name}</MDBCardTitle>
-                      <MDBCardText>{user.username}</MDBCardText>
+                      <MDBCardTitle>{profile.full_name}</MDBCardTitle>
+                      <MDBCardText>{profile.username}</MDBCardText>
 
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2"
                         style={{ backgroundColor: '#efefef' }}>
@@ -386,7 +406,7 @@ export default function ProfileDev() {
                         )}
                       <MDBCardTitle className = "mt-4"> Resume </MDBCardTitle>
                       {resumeExists && !isEditing && (
-                        <a href={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/resumes/resumes/${user.id}/1`} download="Resume.pdf" target='_blank'>Download Resume</a>
+                        <a href={`https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/resumes/resumes/${profile.id}/1`} download="Resume.pdf" target='_blank'>Download Resume</a>
                       )}
                       {!resumeExists && !isEditing && (
                         <p>No resume on file</p>

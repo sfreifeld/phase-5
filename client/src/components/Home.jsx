@@ -53,9 +53,9 @@ function Home( ) {
     }
 
     // Apply sort
-    if (sortType == 'postedDate') {
+    if (sortType == 'projectLength') {
       filteredProjects.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    } else if (sortType == 'projectLength') {
+    } else if (sortType == 'postedDate') {
       filteredProjects.sort((a, b) => lengthSortOrder[a.project_length] - lengthSortOrder[b.project_length]);
     }
 

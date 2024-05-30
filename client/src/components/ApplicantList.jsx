@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { supabase } from "../supabaseClient";
 import confetti from 'canvas-confetti';
 import { useSession } from './SessionContext';
+import { Link } from 'react-router-dom';
 
 function ApplicantList() {
     const { id } = useParams();
@@ -97,6 +98,9 @@ function ApplicantList() {
     }, [id, status]);
 
 
+
+
+
     //Gets list of devs who have applied to project
     useEffect(() => {
         supabase
@@ -168,17 +172,23 @@ function ApplicantList() {
                     Project Status: {capitalizeWords(status)}
                 </h3>
                 {status == 'in progress' && userType == 'org' && project.org_id == user.id ? (
-                    <button className='complete-btn' onClick={handleCompleteProject}>Project Complete</button>
+                    <button className='complete-btn' onClick={handleCompleteProject}>Complete</button>
                 ) : null}
                 </div>
         
-            {status == 'open' && Object.keys(applicants).length > 0 && userType == 'org' && (
+            {status == 'open' && Object.keys(applicants).length > 0 && userType == 'org' && project.org_id == user.id && (
                 <>
                     <h3 className="mb-3">Are you ready to choose a developer for this project?</h3>
                     {applicants.map((applicant, index) => (
-                        <button className="btn" style={{ cursor: 'pointer'}} key={index} onClick={() => handleChooseApplicant(applicant)}>
+                        <button className="btn me-2" style={{ cursor: 'pointer'}} key={index} onClick={() => handleChooseApplicant(applicant)}>
                             {applicant.full_name}
                         </button>
+                    ))}
+                    <h3 className='mt-3'> Applicant Profiles</h3>
+                    {applicants.map((applicant) => (
+                        <>
+                        <Link to={`/profile/${applicant.profile_id}`}>{applicant.full_name}</Link><br></br>
+                        </>
                     ))}
                 </>
             )}

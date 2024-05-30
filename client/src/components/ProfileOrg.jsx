@@ -5,9 +5,9 @@ import NavBarMain from "./NavBar";
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { useSession } from './SessionContext';
 import { Link } from 'react-router-dom';
 import backgroundImage from '../assets/background-org.jpg';
+import { useSession } from './SessionContext';
 
 export default function ProfileOrg() {
 
@@ -16,15 +16,40 @@ export default function ProfileOrg() {
   const [editableDescription, setEditableDescription] = useState("This is your nonprofit summary.  Here you can write what your organization does, your mission statement, what kind of work you're looking for, and anything else!");
   const [tags, setTags] = useState([])
   const { id } = useParams();
-  const { session, user } = useSession();
   const [profileImageUrl, setProfileImageUrl] = useState('');
+  const [profile, setProfile] = useState('')
+  const [loading, setLoading] = useState(true);
+  const { user } = useSession();
 
-  if (!user) {
-    return <div>Loading...</div>;
-  }
 
   useEffect(() => {
-    const imageUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}`;
+    supabase
+      .from('organizations')
+      .select('*')
+      .eq('profile_id', id)
+      .single()
+      .then(response => {
+        if (response.data) {
+          setProfile(response.data);
+        } else {
+          console.error('Failed to fetch user data:', response.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  },[id])
+
+  useEffect(() => {
+    if (profile) {
+        setLoading(false);
+    } else {
+        setLoading(true);
+    }
+}, [profile]);
+
+  useEffect(() => {
+    const imageUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${id}`;
     fetch(imageUrl)
         .then(response => {
             if (response.ok) {
@@ -36,7 +61,7 @@ export default function ProfileOrg() {
         .catch(() => {
             setProfileImageUrl('https://christopherscottedwards.com/wp-content/uploads/2018/07/Generic-Profile.jpg'); // Default image URL on error
         });
-}, [user.profile_id]); 
+}, [id]); 
 
   // handles the logic for when a person drops a file for their profile picture
   const {getRootProps, getInputProps} = useDropzone({
@@ -54,7 +79,7 @@ export default function ProfileOrg() {
       supabase
         .storage
         .from('avatars')
-        .upload(`${user.profile_id}`, file, {
+        .upload(`${id}`, file, {
           cacheControl: '3600',
           upsert: true
         })
@@ -64,7 +89,7 @@ export default function ProfileOrg() {
           } else {
             console.log('File uploaded successfully:', data);
             // Optimistically update the profile picture URL in state
-            const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${user.profile_id}?${new Date().getTime()}`;
+            const newProfilePicUrl = `https://iromcovydnlvukoirsvp.supabase.co/storage/v1/object/public/avatars/${id}?${new Date().getTime()}`;
             setProfileImageUrl(newProfilePicUrl);
           }
         });
@@ -80,7 +105,7 @@ export default function ProfileOrg() {
                description: editableDescription,
                tags: tags 
               })
-            .eq('id', user.id)
+            .eq('id', profile.id)
             .single()
             .then(({ data: updateData, error: updateError }) => {
                 if (updateError) {
@@ -139,11 +164,11 @@ export default function ProfileOrg() {
   }
     //gets list of projects for that org
   useEffect(() => {
-    if (user) {
+    if (profile) {
       supabase
         .from('projects')
         .select('*')
-        .eq('org_id', user.id)
+        .eq('org_id', profile.id)
         .then(({ data: projectsData, error: projectsError }) => {
           if (projectsError) {
             console.error('Error fetching projects data:', projectsError);
@@ -152,22 +177,22 @@ export default function ProfileOrg() {
           setProjects(projectsData);
         });
     }
-  }, [user]); 
+  }, [profile]); 
 
 
 
   useEffect(() => {
-    if (user) {
-      if (user.description) {
-        setEditableDescription(user.description);
+    if (profile) {
+      if (profile.description) {
+        setEditableDescription(profile.description);
       } else {
         setEditableDescription("This is your nonprofit description. You can write about what your organization does, your mission statement, and what kind of work you're looking for!");
       }
-      if (user.tags) {
-        setTags(user.tags)
+      if (profile.tags) {
+        setTags(profile.tags)
       }
     }
-  }, [user]);
+  }, [profile]);
 
 
 
@@ -200,8 +225,8 @@ export default function ProfileOrg() {
                         fluid /> )}
                     </div>
                     <div className="flex-grow-1 ms-3">
-                        <MDBCardTitle>{user.org_name}</MDBCardTitle>
-                        <MDBCardText><a href={user.website_url}>{user.website_url}</a></MDBCardText>
+                        <MDBCardTitle>{profile.org_name}</MDBCardTitle>
+                        <MDBCardText><a href={profile.website_url}>{profile.website_url}</a></MDBCardText>
                       <div className="d-flex justify-content-start rounded-3 p-2 mb-2"
                         style={{ backgroundColor: '#efefef' }}>
                         <div>
@@ -249,7 +274,7 @@ export default function ProfileOrg() {
                       <MDBCardTitle>Current Projects</MDBCardTitle>
                       <ul>
                         {projects && projects.length > 0 ? (
-                            projects.filter(project => project.status === 'open').map(project => (
+                            projects.filter(project => project.status == 'open' ||project.status == 'in progress' ).map(project => (
                               <li key={project.id}>
                                 <div className="d-flex flex-row">
                                   <Link to={`/project/${project.id}`}>{project.title}</Link>

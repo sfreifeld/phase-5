@@ -153,7 +153,7 @@ html, body {
 
 
 .complete-btn {
-   background-color: rgb(45, 186, 45);
+   background-color: rgb(38, 181, 76);
    align-items: center;
    font-family: 'Karla', sans-serif;
    font-weight: 400;
@@ -171,8 +171,10 @@ html, body {
    min-width: 0px;
    overflow: hidden;
    padding: 0px;
-   padding-left: 20px;
-   padding-right: 20px;
+   padding-left: 15px;
+   padding-right: 15px;
+   margin: 5px;
+   margin-bottom: 10px;
    text-align: center;
    touch-action: manipulation;
    transition: background-color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s;
